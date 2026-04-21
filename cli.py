@@ -2968,9 +2968,10 @@ class DurianCLI:
         if self.lite:
             term_width = shutil.get_terminal_size().columns
             if term_width >= 95:
-                self.console.print()
-                self.console.print(DURIAN_AGENT_LOGO + f"\n[dim #FFD700]v{_DURIAN_VERSION}  {_DURIAN_RELEASE_DATE}[/]")
-                self.console.print()
+                # self.console.print()
+                # self.console.print(DURIAN_AGENT_LOGO + f"\n[dim #FFD700]v{_DURIAN_VERSION}  {_DURIAN_RELEASE_DATE}[/]")
+                self.console.print(DURIAN_AGENT_LOGO + f"[dim #FFD700]𖦹{_DURIAN_VERSION}({_DURIAN_RELEASE_DATE})[/]")
+                # self.console.print()
             return
 
         # Get context length for display before branching so it remains
