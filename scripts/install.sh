@@ -94,7 +94,7 @@ print_banner() {
     echo ""
     echo -e "${MAGENTA}${BOLD}"
     echo "┌─────────────────────────────────────────────────────────┐"
-    echo "│             ◆ Durian Agent Installer 🔸                │"
+    echo "│             𖤓 Durian Agent Installer 🔸                │"
     echo "├─────────────────────────────────────────────────────────┤"
     echo "│  An open source AI agent by gguf                        │"
     echo "└─────────────────────────────────────────────────────────┘"

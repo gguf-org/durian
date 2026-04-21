@@ -4226,14 +4226,14 @@ class GatewayRunner:
             ctx_display = str(context_length)
 
         lines = [
-            f"◆ Model: `{model}`",
-            f"◆ Provider: {provider or 'openrouter'}",
-            f"◆ Context: {ctx_display} tokens ({ctx_source})",
+            f"𖤓 Model: `{model}`",
+            f"𖤓 Provider: {provider or 'openrouter'}",
+            f"𖤓 Context: {ctx_display} tokens ({ctx_source})",
         ]
 
         # Show endpoint for local/custom setups
         if base_url and ("localhost" in base_url or "127.0.0.1" in base_url or "0.0.0.0" in base_url):
-            lines.append(f"◆ Endpoint: {base_url}")
+            lines.append(f"𖤓 Endpoint: {base_url}")
 
         return "\n".join(lines)
 
@@ -6928,7 +6928,7 @@ class GatewayRunner:
             return f"✗ Failed to start update: {e}"
 
         self._schedule_update_notification_watch()
-        return "◆ Starting Durian update… I'll stream progress here."
+        return "𖤓 Starting Durian update… I'll stream progress here."
 
     def _schedule_update_notification_watch(self) -> None:
         """Ensure a background task is watching for update completion."""
@@ -7110,7 +7110,7 @@ class GatewayRunner:
                             default_hint = f" (default: {default})" if default else ""
                             await adapter.send(
                                 chat_id,
-                                f"◆ **Update needs your input:**\n\n"
+                                f"𖤓 **Update needs your input:**\n\n"
                                 f"{prompt_text}{default_hint}\n\n"
                                 f"Reply `/approve` (yes) or `/deny` (no), "
                                 f"or type your answer directly."

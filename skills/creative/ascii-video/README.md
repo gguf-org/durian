@@ -72,7 +72,7 @@ Each sorted dark-to-bright, each a different visual texture. Validated against t
 | Alchemical | ` ☉☽♀♂♃♄♅♆♇` | Esoteric |
 | Arrows | ` ←↑→↓↔↕↖↗↘↙` | Directional, kinetic |
 | Music | ` ♪♫♬♩♭♮♯○●` | Musical |
-| Project-specific | ` .·~=≈∞⚡☿✦★⊕◊◆▲▼●■` | Themed per project |
+| Project-specific | ` .·~=≈∞⚡☿✦★⊕◊𖤓▲▼●■` | Themed per project |
 
 Custom palettes are built per project to match the content.
 
@@ -258,11 +258,11 @@ Auto-detects CPU count, RAM, platform, ffmpeg. Adapts worker count, resolution, 
 
 ## Requirements
 
-◆ Python 3.10+
-◆ NumPy, Pillow, SciPy (audio modes)
-◆ ffmpeg on PATH
-◆ A monospace font (Menlo, Courier, Monaco, auto-detected)
-◆ Optional: OpenCV, ElevenLabs API key (TTS mode)
+𖤓 Python 3.10+
+𖤓 NumPy, Pillow, SciPy (audio modes)
+𖤓 ffmpeg on PATH
+𖤓 A monospace font (Menlo, Courier, Monaco, auto-detected)
+𖤓 Optional: OpenCV, ElevenLabs API key (TTS mode)
 
 ## File structure
 

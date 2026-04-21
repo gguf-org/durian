@@ -151,7 +151,7 @@ from durian_cli.colors import Colors, color
 def print_header(title: str):
     """Print a section header."""
     print()
-    print(color(f"◆ {title}", Colors.CYAN, Colors.BOLD))
+    print(color(f"𖤓 {title}", Colors.CYAN, Colors.BOLD))
 
 
 from durian_cli.cli_output import (  # noqa: E402
@@ -176,7 +176,7 @@ def is_interactive_stdin() -> bool:
 def print_noninteractive_setup_guidance(reason: str | None = None) -> None:
     """Print guidance for headless/non-interactive setup flows."""
     print()
-    print(color("◆ Durian Setup — Non-interactive mode", Colors.CYAN, Colors.BOLD))
+    print(color("𖤓 Durian Setup — Non-interactive mode", Colors.CYAN, Colors.BOLD))
     print()
     if reason:
         print_info(reason)
@@ -2795,7 +2795,7 @@ def run_setup_wizard(args):
                         Colors.MAGENTA,
                     )
                 )
-                print(color(f"│     ◆ Durian Setup — {label:<34s} │", Colors.MAGENTA))
+                print(color(f"│     𖤓 Durian Setup — {label:<34s} │", Colors.MAGENTA))
                 print(
                     color(
                         "└─────────────────────────────────────────────────────────┘",
@@ -2831,7 +2831,7 @@ def run_setup_wizard(args):
     )
     print(
         color(
-            "│             ◆ Durian Agent Setup Wizard                 │", Colors.MAGENTA
+            "│             𖤓 Durian Agent Setup Wizard                 │", Colors.MAGENTA
         )
     )
     print(
