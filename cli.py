@@ -7621,7 +7621,7 @@ class DurianCLI:
         # Add user message to history
         self.conversation_history.append({"role": "user", "content": message})
 
-        ChatConsole().print(f"[{_accent_hex()}]{'─' * 40}[/]")
+        ChatConsole().print(f"[{_accent_hex()}]{'─' * shutil.get_terminal_size().columns}[/]")
         print(flush=True)
         
         try:
@@ -9631,7 +9631,7 @@ class DurianCLI:
                         expanded = _paste_ref_re.sub(_expand_ref, user_input)
                         total_lines = expanded.count('\n') + 1
                         n_pastes = len(paste_refs)
-                        _user_bar = f"[{_accent_hex()}]{'─' * 40}[/]"
+                        _user_bar = f"[{_accent_hex()}]{'─' * shutil.get_terminal_size().columns}[/]"
                         print()
                         ChatConsole().print(_user_bar)
                         # Show any surrounding user text alongside the paste summary
@@ -9650,7 +9650,7 @@ class DurianCLI:
                             )
                         user_input = expanded
                     else:
-                        _user_bar = f"[{_accent_hex()}]{'─' * 40}[/]"
+                        _user_bar = f"[{_accent_hex()}]{'─' * shutil.get_terminal_size().columns}[/]"
                         if '\n' in user_input:
                             first_line = user_input.split('\n')[0]
                             line_count = user_input.count('\n') + 1
