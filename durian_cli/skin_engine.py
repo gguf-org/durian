@@ -178,7 +178,7 @@ _BUILTIN_SKINS: Dict[str, Dict[str, Any]] = {
         },
         "branding": {
             "agent_name": "Durian Agent",
-            "welcome": "Welcome to Durian Agent! Type your message or /help for commands.",
+            "welcome": "Welcome! Type your message or /help for commands.",
             "goodbye": "Goodbye! ✷",
             "response_label": " ✷ Durian ",
             "prompt_symbol": "❯ ",
@@ -273,7 +273,7 @@ _BUILTIN_SKINS: Dict[str, Dict[str, Any]] = {
         "spinner": {},
         "branding": {
             "agent_name": "Durian Agent",
-            "welcome": "Welcome to Durian Agent! Type your message or /help for commands.",
+            "welcome": "Welcome! Type your message or /help for commands.",
             "goodbye": "Goodbye! ✷",
             "response_label": " ✷ Durian ",
             "prompt_symbol": "❯ ",
@@ -304,7 +304,7 @@ _BUILTIN_SKINS: Dict[str, Dict[str, Any]] = {
         "spinner": {},
         "branding": {
             "agent_name": "Durian Agent",
-            "welcome": "Welcome to Durian Agent! Type your message or /help for commands.",
+            "welcome": "Welcome! Type your message or /help for commands.",
             "goodbye": "Goodbye! ✷",
             "response_label": " ✷ Durian ",
             "prompt_symbol": "❯ ",
@@ -341,7 +341,7 @@ _BUILTIN_SKINS: Dict[str, Dict[str, Any]] = {
         "spinner": {},
         "branding": {
             "agent_name": "Durian Agent",
-            "welcome": "Welcome to Durian Agent! Type your message or /help for commands.",
+            "welcome": "Welcome! Type your message or /help for commands.",
             "goodbye": "Goodbye! ✷",
             "response_label": " ✷ Durian ",
             "prompt_symbol": "❯ ",
@@ -378,7 +378,7 @@ _BUILTIN_SKINS: Dict[str, Dict[str, Any]] = {
         "spinner": {},
         "branding": {
             "agent_name": "Durian Agent",
-            "welcome": "Welcome to Durian Agent! Type your message or /help for commands.",
+            "welcome": "Welcome! Type your message or /help for commands.",
             "goodbye": "Goodbye! \u2695",
             "response_label": " \u2695 Durian ",
             "prompt_symbol": "\u276f ",
