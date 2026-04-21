@@ -2970,7 +2970,7 @@ class DurianCLI:
             if term_width >= 95:
                 # self.console.print()
                 # self.console.print(DURIAN_AGENT_LOGO + f"\n[dim #FFD700]v{_DURIAN_VERSION}  {_DURIAN_RELEASE_DATE}[/]")
-                self.console.print(DURIAN_AGENT_LOGO + f"[dim #FFD700]𖦹{_DURIAN_VERSION}({_DURIAN_RELEASE_DATE})[/]")
+                self.console.print(DURIAN_AGENT_LOGO + f"[dim #FFD700] ✻ {_DURIAN_VERSION} ({_DURIAN_RELEASE_DATE})[/]")
                 # self.console.print()
             return
 
