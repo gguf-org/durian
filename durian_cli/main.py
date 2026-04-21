@@ -765,7 +765,7 @@ def cmd_chat(args):
         "skills": getattr(args, "skills", None),
         "verbose": args.verbose,
         "quiet": getattr(args, "quiet", False),
-        "lite": getattr(args, "lite", False),
+        "lite": not getattr(args, "more", False),
         "query": args.query,
         "image": getattr(args, "image", None),
         "resume": getattr(args, "resume", None),
@@ -4579,10 +4579,10 @@ For more help on a command:
         help="Include the session ID in the agent's system prompt"
     )
     parser.add_argument(
-        "--lite",
+        "--more",
         action="store_true",
         default=False,
-        help="Lite mode: show only the logo on startup, skip the info box"
+        help="Show the full info box on startup (default is lite mode: logo only)"
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
@@ -4634,10 +4634,10 @@ For more help on a command:
         help="Quiet mode for programmatic use: suppress banner, spinner, and tool previews. Only output the final response and session info."
     )
     chat_parser.add_argument(
-        "--lite",
+        "--more",
         action="store_true",
         default=False,
-        help="Lite mode: show only the logo on startup, skip the info box"
+        help="Show the full info box on startup (default is lite mode: logo only)"
     )
     chat_parser.add_argument(
         "--resume", "-r",
@@ -6120,8 +6120,8 @@ Examples:
         args.continue_last = None
         if not hasattr(args, "worktree"):
             args.worktree = False
-        if not hasattr(args, "lite"):
-            args.lite = False
+        if not hasattr(args, "more"):
+            args.more = False
         cmd_chat(args)
         return
     
