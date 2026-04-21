@@ -7621,7 +7621,7 @@ class DurianCLI:
         # Add user message to history
         self.conversation_history.append({"role": "user", "content": message})
 
-        ChatConsole().print(f"[{_accent_hex()}]{'─' * shutil.get_terminal_size().columns}[/]")
+        # ChatConsole().print(f"[{_accent_hex()}]{'─' * shutil.get_terminal_size().columns}[/]")
         print(flush=True)
         
         try:
@@ -9631,34 +9631,39 @@ class DurianCLI:
                         expanded = _paste_ref_re.sub(_expand_ref, user_input)
                         total_lines = expanded.count('\n') + 1
                         n_pastes = len(paste_refs)
+                        # _user_bar = f"[{_accent_hex()}]{'─' * shutil.get_terminal_size().columns}[/]"
+                        # print()
+                        # ChatConsole().print(_user_bar)
                         # Show any surrounding user text alongside the paste summary
                         split_parts = _paste_ref_re.split(user_input)
                         visible_user_text = " ".join(
                             split_parts[i].strip() for i in range(0, len(split_parts), 2) if split_parts[i].strip()
                         )
-                        print()
                         if visible_user_text:
                             ChatConsole().print(
-                                f"[bold {_accent_hex()}]you[/] [bold]{_escape(visible_user_text)}[/] "
+                                f"[bold {_accent_hex()}]\u25cf[/] [bold]{_escape(visible_user_text)}[/] "
                                 f"[dim]({n_pastes} pasted block{'s' if n_pastes > 1 else ''}, {total_lines} lines total)[/]"
                             )
                         else:
                             ChatConsole().print(
-                                f"[bold {_accent_hex()}]you[/] [bold]{_escape(f'[Pasted text: {total_lines} lines]')}[/]"
+                                f"[bold {_accent_hex()}]\u25cf[/] [bold]{_escape(f'[Pasted text: {total_lines} lines]')}[/]"
                             )
                         user_input = expanded
                     else:
+                        # _user_bar = f"[{_accent_hex()}]{'─' * shutil.get_terminal_size().columns}[/]"
                         if '\n' in user_input:
                             first_line = user_input.split('\n')[0]
                             line_count = user_input.count('\n') + 1
                             print()
+                            # ChatConsole().print(_user_bar)
                             ChatConsole().print(
-                                f"[bold {_accent_hex()}]you[/] [bold]{_escape(first_line)}[/] "
+                                f"[bold {_accent_hex()}]●[/] [bold]{_escape(first_line)}[/] "
                                 f"[dim](+{line_count - 1} lines)[/]"
                             )
                         else:
                             print()
-                            ChatConsole().print(f"[bold {_accent_hex()}]you[/] [bold]{_escape(user_input)}[/]")
+                            # ChatConsole().print(_user_bar)
+                            ChatConsole().print(f"[bold {_accent_hex()}]●[/] [bold]{_escape(user_input)}[/]")
                     
                     # Show image attachment count
                     if submit_images:
