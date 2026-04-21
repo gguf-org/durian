@@ -38,7 +38,7 @@ $NodeVersion = "22"
 function Write-Banner {
     Write-Host ""
     Write-Host "┌─────────────────────────────────────────────────────────┐" -ForegroundColor Magenta
-    Write-Host "│             🔸𖤓 Durian Agent Installer                  │" -ForegroundColor Magenta
+    Write-Host "│             🔸✷ Durian Agent Installer                  │" -ForegroundColor Magenta
     Write-Host "├─────────────────────────────────────────────────────────┤" -ForegroundColor Magenta
     Write-Host "│  An open source AI agent by gguf                        │" -ForegroundColor Magenta
     Write-Host "└─────────────────────────────────────────────────────────┘" -ForegroundColor Magenta
@@ -819,7 +819,7 @@ function Start-GatewayIfConfigured {
 function Write-Completion {
     Write-Host ""
     Write-Host "┌─────────────────────────────────────────────────────────┐" -ForegroundColor Green
-    Write-Host "│              ✓ Installation Complete! 𖤓                 │" -ForegroundColor Green
+    Write-Host "│              ✓ Installation Complete! ✷                 │" -ForegroundColor Green
     Write-Host "└─────────────────────────────────────────────────────────┘" -ForegroundColor Green
     Write-Host ""
     

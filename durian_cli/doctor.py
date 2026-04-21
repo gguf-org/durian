@@ -148,7 +148,7 @@ def _check_gateway_service_linger(issues: list[str]) -> None:
         return
 
     print()
-    print(color("𖤓 Gateway Service", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Gateway Service", Colors.CYAN, Colors.BOLD))
 
     linger_enabled, linger_detail = get_systemd_linger_status()
     if linger_enabled is True:
@@ -182,7 +182,7 @@ def run_doctor(args):
     # Check: Python version
     # =========================================================================
     print()
-    print(color("𖤓 Python Environment", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Python Environment", Colors.CYAN, Colors.BOLD))
     
     py_version = sys.version_info
     if py_version >= (3, 11):
@@ -207,7 +207,7 @@ def run_doctor(args):
     # Check: Required packages
     # =========================================================================
     print()
-    print(color("𖤓 Required Packages", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Required Packages", Colors.CYAN, Colors.BOLD))
     
     required_packages = [
         ("openai", "OpenAI SDK"),
@@ -242,7 +242,7 @@ def run_doctor(args):
     # Check: Configuration files
     # =========================================================================
     print()
-    print(color("𖤓 Configuration Files", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Configuration Files", Colors.CYAN, Colors.BOLD))
     
     # Check ~/.durian/.env (primary location for user config)
     env_path = DURIAN_HOME / '.env'
@@ -353,7 +353,7 @@ def run_doctor(args):
             config_issues = validate_config_structure()
             if config_issues:
                 print()
-                print(color("𖤓 Config Structure", Colors.CYAN, Colors.BOLD))
+                print(color("✷ Config Structure", Colors.CYAN, Colors.BOLD))
                 for ci in config_issues:
                     if ci.severity == "error":
                         check_fail(ci.message)
@@ -370,7 +370,7 @@ def run_doctor(args):
     # Check: Auth providers
     # =========================================================================
     print()
-    print(color("𖤓 Auth Providers", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Auth Providers", Colors.CYAN, Colors.BOLD))
 
     try:
         from durian_cli.auth import get_nous_auth_status, get_codex_auth_status
@@ -400,7 +400,7 @@ def run_doctor(args):
     # Check: Directory structure
     # =========================================================================
     print()
-    print(color("𖤓 Directory Structure", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Directory Structure", Colors.CYAN, Colors.BOLD))
     
     durian_home = DURIAN_HOME
     if durian_home.exists():
@@ -520,7 +520,7 @@ def run_doctor(args):
     # =========================================================================
     if sys.platform != "win32":
         print()
-        print(color("𖤓 Command Installation", Colors.CYAN, Colors.BOLD))
+        print(color("✷ Command Installation", Colors.CYAN, Colors.BOLD))
 
         # Determine the venv entry point location
         _venv_bin = None
@@ -599,7 +599,7 @@ def run_doctor(args):
     # Check: External tools
     # =========================================================================
     print()
-    print(color("𖤓 External Tools", Colors.CYAN, Colors.BOLD))
+    print(color("✷ External Tools", Colors.CYAN, Colors.BOLD))
     
     # Git
     if shutil.which("git"):
@@ -743,7 +743,7 @@ def run_doctor(args):
     # Check: API connectivity
     # =========================================================================
     print()
-    print(color("𖤓 API Connectivity", Colors.CYAN, Colors.BOLD))
+    print(color("✷ API Connectivity", Colors.CYAN, Colors.BOLD))
     
     openrouter_key = os.getenv("OPENROUTER_API_KEY")
     if openrouter_key:
@@ -863,7 +863,7 @@ def run_doctor(args):
     # Check: Submodules
     # =========================================================================
     print()
-    print(color("𖤓 Submodules", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Submodules", Colors.CYAN, Colors.BOLD))
     
     # tinker-atropos (RL training backend)
     tinker_dir = PROJECT_ROOT / "tinker-atropos"
@@ -885,7 +885,7 @@ def run_doctor(args):
     # Check: Tool Availability
     # =========================================================================
     print()
-    print(color("𖤓 Tool Availability", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Tool Availability", Colors.CYAN, Colors.BOLD))
     
     try:
         # Add project root to path for imports
@@ -918,7 +918,7 @@ def run_doctor(args):
     # Check: Skills Hub
     # =========================================================================
     print()
-    print(color("𖤓 Skills Hub", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Skills Hub", Colors.CYAN, Colors.BOLD))
 
     hub_dir = DURIAN_HOME / "skills" / ".hub"
     if hub_dir.exists():
@@ -950,7 +950,7 @@ def run_doctor(args):
     # Memory Provider (only check the active provider, if any)
     # =========================================================================
     print()
-    print(color("𖤓 Memory Provider", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Memory Provider", Colors.CYAN, Colors.BOLD))
 
     _active_memory_provider = ""
     try:
@@ -1035,7 +1035,7 @@ def run_doctor(args):
         named_profiles = [p for p in list_profiles() if not p.is_default]
         if named_profiles:
             print()
-            print(color("𖤓 Profiles", Colors.CYAN, Colors.BOLD))
+            print(color("✷ Profiles", Colors.CYAN, Colors.BOLD))
             check_ok(f"{len(named_profiles)} profile(s) found")
             wrapper_dir = _get_wrapper_dir()
             for p in named_profiles:

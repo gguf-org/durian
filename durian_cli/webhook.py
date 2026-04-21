@@ -193,7 +193,7 @@ def _cmd_list(args):
         events = ", ".join(route.get("events", [])) or "(all)"
         deliver = route.get("deliver", "log")
         desc = route.get("description", "")
-        print(f"  𖤓 {name}")
+        print(f"  ✷ {name}")
         if desc:
             print(f"    {desc}")
         print(f"    URL:     {base_url}/webhooks/{name}")

@@ -643,7 +643,7 @@ DEFAULT_CONFIG = {
     # WhatsApp platform settings (gateway mode)
     "whatsapp": {
         # Reply prefix prepended to every outgoing WhatsApp message.
-        # Default (None) uses the built-in "𖤓 *Durian Agent*" header.
+        # Default (None) uses the built-in "✷ *Durian Agent*" header.
         # Set to "" (empty string) to disable the header entirely.
         # Supports \n for newlines, e.g. "🤖 *My Bot*\n──────\n"
     },
@@ -2999,19 +2999,19 @@ def show_config():
     
     print()
     print(color("┌─────────────────────────────────────────────────────────┐", Colors.CYAN))
-    print(color("│              𖤓 Durian Configuration                    │", Colors.CYAN))
+    print(color("│              ✷ Durian Configuration                    │", Colors.CYAN))
     print(color("└─────────────────────────────────────────────────────────┘", Colors.CYAN))
     
     # Paths
     print()
-    print(color("𖤓 Paths", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Paths", Colors.CYAN, Colors.BOLD))
     print(f"  Config:       {get_config_path()}")
     print(f"  Secrets:      {get_env_path()}")
     print(f"  Install:      {get_project_root()}")
     
     # API Keys
     print()
-    print(color("𖤓 API Keys", Colors.CYAN, Colors.BOLD))
+    print(color("✷ API Keys", Colors.CYAN, Colors.BOLD))
     
     keys = [
         ("OPENROUTER_API_KEY", "OpenRouter"),
@@ -3034,13 +3034,13 @@ def show_config():
     
     # Model settings
     print()
-    print(color("𖤓 Model", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Model", Colors.CYAN, Colors.BOLD))
     print(f"  Model:        {config.get('model', 'not set')}")
     print(f"  Max turns:    {config.get('agent', {}).get('max_turns', DEFAULT_CONFIG['agent']['max_turns'])}")
     
     # Display
     print()
-    print(color("𖤓 Display", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Display", Colors.CYAN, Colors.BOLD))
     display = config.get('display', {})
     print(f"  Personality:  {display.get('personality', 'kawaii')}")
     print(f"  Reasoning:    {'on' if display.get('show_reasoning', False) else 'off'}")
@@ -3048,7 +3048,7 @@ def show_config():
 
     # Terminal
     print()
-    print(color("𖤓 Terminal", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Terminal", Colors.CYAN, Colors.BOLD))
     terminal = config.get('terminal', {})
     print(f"  Backend:      {terminal.get('backend', 'local')}")
     print(f"  Working dir:  {terminal.get('cwd', '.')}")
@@ -3074,7 +3074,7 @@ def show_config():
     
     # Timezone
     print()
-    print(color("𖤓 Timezone", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Timezone", Colors.CYAN, Colors.BOLD))
     tz = config.get('timezone', '')
     if tz:
         print(f"  Timezone:     {tz}")
@@ -3083,7 +3083,7 @@ def show_config():
 
     # Compression
     print()
-    print(color("𖤓 Context Compression", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Context Compression", Colors.CYAN, Colors.BOLD))
     compression = config.get('compression', {})
     enabled = compression.get('enabled', True)
     print(f"  Enabled:      {'yes' if enabled else 'no'}")
@@ -3110,7 +3110,7 @@ def show_config():
     )
     if has_overrides:
         print()
-        print(color("𖤓 Auxiliary Models (overrides)", Colors.CYAN, Colors.BOLD))
+        print(color("✷ Auxiliary Models (overrides)", Colors.CYAN, Colors.BOLD))
         for label, task_cfg in aux_tasks.items():
             prov = task_cfg.get('provider', 'auto')
             mdl = task_cfg.get('model', '')
@@ -3122,7 +3122,7 @@ def show_config():
     
     # Messaging
     print()
-    print(color("𖤓 Messaging Platforms", Colors.CYAN, Colors.BOLD))
+    print(color("✷ Messaging Platforms", Colors.CYAN, Colors.BOLD))
     
     telegram_token = get_env_value('TELEGRAM_BOT_TOKEN')
     discord_token = get_env_value('DISCORD_BOT_TOKEN')
@@ -3137,7 +3137,7 @@ def show_config():
         if skill_vars:
             resolved = resolve_skill_config_values(skill_vars)
             print()
-            print(color("𖤓 Skill Settings", Colors.CYAN, Colors.BOLD))
+            print(color("✷ Skill Settings", Colors.CYAN, Colors.BOLD))
             for var in skill_vars:
                 key = var["key"]
                 value = resolved.get(key, "")

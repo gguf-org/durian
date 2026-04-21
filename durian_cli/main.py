@@ -798,7 +798,7 @@ def cmd_whatsapp(args):
     from durian_cli.config import get_env_value, save_env_value
 
     print()
-    print("𖤓 WhatsApp Setup")
+    print("✷ WhatsApp Setup")
     print("=" * 50)
 
     # ── Step 1: Choose mode ──────────────────────────────────────────────
@@ -962,14 +962,14 @@ def cmd_whatsapp(args):
             print("    2. Send a message to the bot's WhatsApp number")
             print("    3. The agent will reply automatically")
             print()
-            print("  Tip: Agent responses are prefixed with '𖤓 Durian Agent'")
+            print("  Tip: Agent responses are prefixed with '✷ Durian Agent'")
         else:
             print("  Next steps:")
             print("    1. Start the gateway:  durian gateway")
             print("    2. Open WhatsApp → Message Yourself")
             print("    3. Type a message — the agent will reply")
             print()
-            print("  Tip: Agent responses are prefixed with '𖤓 Durian Agent'")
+            print("  Tip: Agent responses are prefixed with '✷ Durian Agent'")
             print("  so you can tell them apart from your own messages.")
         print()
         print("  Or install as a service: durian gateway install")
@@ -3625,7 +3625,7 @@ def cmd_update(args):
     # In gateway mode, use file-based IPC for prompts instead of stdin
     gw_input_fn = (lambda prompt, default="": _gateway_prompt(prompt, default)) if gateway_mode else None
     
-    print("𖤓 Updating Durian Agent...")
+    print("✷ Updating Durian Agent...")
     print()
     
     # Try git-based update first, fall back to ZIP download on Windows
@@ -4228,7 +4228,7 @@ def cmd_profile(args):
         print(f" {'─' * 15}    {'─' * 27}    {'─' * 11}    {'─' * 12}")
 
         for p in profiles:
-            marker = " 𖤓" if (p.name == active or (active == "default" and p.is_default)) else "  "
+            marker = " ✷" if (p.name == active or (active == "default" and p.is_default)) else "  "
             name = p.name
             model = (p.model or "—")[:26]
             gw = "running" if p.gateway_running else "stopped"

@@ -1428,8 +1428,8 @@ def _build_compact_banner() -> str:
     dim_color = _skin.get_color("banner_dim", "#B8860B") if _skin else "#B8860B"
 
     if skin_name == "default":
-        line1 = "𖤓 DURIAN - AI Agent Framework"
-        tiny_line = "𖤓 DURIAN"
+        line1 = "✷ DURIAN - AI Agent Framework"
+        tiny_line = "✷ DURIAN"
     else:
         agent_name = _skin.get_branding("agent_name", "Durian Agent") if _skin else "Durian Agent"
         line1 = f"{agent_name} - AI Agent Framework"
@@ -2065,10 +2065,10 @@ class DurianCLI:
             duration_label = snapshot["duration"]
 
             if width < 52:
-                text = f"𖤓 {snapshot['model_short']} · {duration_label}"
+                text = f"✷ {snapshot['model_short']} · {duration_label}"
                 return self._trim_status_bar_text(text, width)
             if width < 76:
-                parts = [f"𖤓 {snapshot['model_short']}", percent_label]
+                parts = [f"✷ {snapshot['model_short']}", percent_label]
                 parts.append(duration_label)
                 return self._trim_status_bar_text(" · ".join(parts), width)
 
@@ -2079,11 +2079,11 @@ class DurianCLI:
             else:
                 context_label = "ctx --"
 
-            parts = [f"𖤓 {snapshot['model_short']}", context_label, percent_label]
+            parts = [f"✷ {snapshot['model_short']}", context_label, percent_label]
             parts.append(duration_label)
             return self._trim_status_bar_text(" │ ".join(parts), width)
         except Exception:
-            return f"𖤓 {self.model if getattr(self, 'model', None) else 'Durian'}"
+            return f"✷ {self.model if getattr(self, 'model', None) else 'Durian'}"
 
     def _get_status_bar_fragments(self):
         if not self._status_bar_visible or getattr(self, '_model_picker_state', None):
@@ -2100,7 +2100,7 @@ class DurianCLI:
 
             if width < 52:
                 frags = [
-                    ("class:status-bar", " 𖤓 "),
+                    ("class:status-bar", " ✷ "),
                     ("class:status-bar-strong", snapshot["model_short"]),
                     ("class:status-bar-dim", " · "),
                     ("class:status-bar-dim", duration_label),
@@ -2111,7 +2111,7 @@ class DurianCLI:
                 percent_label = f"{percent}%" if percent is not None else "--"
                 if width < 76:
                     frags = [
-                        ("class:status-bar", " 𖤓 "),
+                        ("class:status-bar", " ✷ "),
                         ("class:status-bar-strong", snapshot["model_short"]),
                         ("class:status-bar-dim", " · "),
                         (self._status_bar_context_style(percent), percent_label),
@@ -2129,7 +2129,7 @@ class DurianCLI:
 
                     bar_style = self._status_bar_context_style(percent)
                     frags = [
-                        ("class:status-bar", " 𖤓 "),
+                        ("class:status-bar", " ✷ "),
                         ("class:status-bar-strong", snapshot["model_short"]),
                         ("class:status-bar-dim", " │ "),
                         ("class:status-bar-dim", context_label),
@@ -5912,7 +5912,7 @@ class DurianCLI:
 
                     ChatConsole().print(Panel(
                         _rich_text_from_ansi(response),
-                        title=f"[{_resp_color} bold]𖤓 /btw[/]",
+                        title=f"[{_resp_color} bold]✷ /btw[/]",
                         title_align="left",
                         border_style=_resp_color,
                         box=rich_box.HORIZONTALS,
@@ -7676,7 +7676,7 @@ class DurianCLI:
                     if not _streaming_box_opened:
                         _streaming_box_opened = True
                         w = self.console.width
-                        label = " 𖤓 Durian "
+                        label = " ✷ Durian "
                         fill = w - 2 - len(label)
                         _cprint(f"\n{_ACCENT}╭─{label}{'─' * max(fill - 1, 0)}╮{_RST}")
                     _cprint(f"{_STREAM_PAD}{sentence.rstrip()}")
@@ -7899,11 +7899,11 @@ class DurianCLI:
                 try:
                     from durian_cli.skin_engine import get_active_skin
                     _skin = get_active_skin()
-                    label = _skin.get_branding("response_label", "𖤓 Durian")
+                    label = _skin.get_branding("response_label", "✷ Durian")
                     _resp_color = _skin.get_color("response_border", "#CD7F32")
                     _resp_text = _skin.get_color("banner_text", "#FFF8DC")
                 except Exception:
-                    label = "𖤓 Durian"
+                    label = "✷ Durian"
                     _resp_color = "#CD7F32"
                     _resp_text = "#FFF8DC"
 
@@ -8038,9 +8038,9 @@ class DurianCLI:
         else:
             try:
                 from durian_cli.skin_engine import get_active_goodbye
-                goodbye = get_active_goodbye("Goodbye! 𖤓")
+                goodbye = get_active_goodbye("Goodbye! ✷")
             except Exception:
-                goodbye = "Goodbye! 𖤓"
+                goodbye = "Goodbye! ✷"
             print(goodbye)
 
     def _get_tui_prompt_symbols(self) -> tuple[str, str]:
@@ -8127,7 +8127,7 @@ class DurianCLI:
         if self._command_running:
             return _state_fragment("class:prompt-working", self._command_spinner_frame())
         if self._agent_running:
-            return _state_fragment("class:prompt-working", "𖤓")
+            return _state_fragment("class:prompt-working", "✷")
         if self._voice_mode:
             return _state_fragment("class:voice-prompt", "🎤")
         return [("class:prompt", symbol)]
