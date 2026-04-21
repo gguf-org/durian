@@ -295,7 +295,7 @@ PAL_ARABIC   = " \u0627\u0628\u062a\u062b\u062c\u062d\u062e\u062f\u0630\u0631\u0
 
 #### Dot / Point Progressions
 ```python
-PAL_DOTS     = " ⋅∘∙●◉◎𖤓✦★"                   # dot size progression
+PAL_DOTS     = " ⋅∘∙●◉◎◆✦★"                   # dot size progression
 PAL_BRAILLE  = " ⠁⠂⠃⠄⠅⠆⠇⠈⠉⠊⠋⠌⠍⠎⠏⠐⠑⠒⠓⠔⠕⠖⠗⠘⠙⠚⠛⠜⠝⠞⠟⠿"  # braille patterns
 PAL_STARS    = " ·✧✦✩✨★✶✳✸"               # star progression
 PAL_HALFFILL = " ◔◑◕◐◒◓◖◗◙"               # directional half-fill progression

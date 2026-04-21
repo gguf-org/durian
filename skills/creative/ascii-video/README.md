@@ -72,7 +72,7 @@ Each sorted dark-to-bright, each a different visual texture. Validated against t
 | Alchemical | ` ☉☽♀♂♃♄♅♆♇` | Esoteric |
 | Arrows | ` ←↑→↓↔↕↖↗↘↙` | Directional, kinetic |
 | Music | ` ♪♫♬♩♭♮♯○●` | Musical |
-| Project-specific | ` .·~=≈∞⚡☿✦★⊕◊𖤓▲▼●■` | Themed per project |
+| Project-specific | ` .·~=≈∞⚡☿✦★⊕◊◆▲▼●■` | Themed per project |
 
 Custom palettes are built per project to match the content.
 

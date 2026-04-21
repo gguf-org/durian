@@ -2578,10 +2578,10 @@ class DurianCLI:
             try:
                 from durian_cli.skin_engine import get_active_skin
                 _skin = get_active_skin()
-                label = _skin.get_branding("response_label", "𖤓 Durian")
+                label = _skin.get_branding("response_label", "𖦹 Durian")
                 _text_hex = _skin.get_color("banner_text", "#FFF8DC")
             except Exception:
-                label = "𖤓 Durian"
+                label = "✷ Durian"
                 _text_hex = "#FFF8DC"
             # Build a true-color ANSI escape for the response text color
             # so streamed content matches the Rich Panel appearance.
@@ -3262,13 +3262,13 @@ class DurianCLI:
                     lines.append(f"         {ml}\n", style="dim")
             elif role == "assistant_last":
                 # Last assistant response shown in full, non-dim
-                lines.append("  𖤓 Durian: ", style=f"bold {_assistant_label_c}")
+                lines.append("  𖦹 Durian: ", style=f"bold {_assistant_label_c}")
                 msg_lines = text.splitlines()
                 lines.append(msg_lines[0] + "\n", style="")
                 for ml in msg_lines[1:]:
                     lines.append(f"            {ml}\n", style="")
             else:
-                lines.append("  𖤓 Durian: ", style=f"dim bold {_assistant_label_c}")
+                lines.append("  ✷ Durian: ", style=f"dim bold {_assistant_label_c}")
                 msg_lines = text.splitlines()
                 lines.append(msg_lines[0] + "\n", style="dim")
                 for ml in msg_lines[1:]:
@@ -5776,11 +5776,11 @@ class DurianCLI:
                     try:
                         from durian_cli.skin_engine import get_active_skin
                         _skin = get_active_skin()
-                        label = _skin.get_branding("response_label", "𖤓 Durian")
+                        label = _skin.get_branding("response_label", "𖦹 Durian")
                         _resp_color = _skin.get_color("response_border", "#CD7F32")
                         _resp_text = _skin.get_color("banner_text", "#FFF8DC")
                     except Exception:
-                        label = "𖤓 Durian"
+                        label = "✷ Durian"
                         _resp_color = "#CD7F32"
                         _resp_text = "#FFF8DC"
 
