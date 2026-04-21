@@ -63,7 +63,8 @@ from agent.usage_pricing import (
     format_duration_compact,
     format_token_count_compact,
 )
-from durian_cli.banner import _format_context_length, format_banner_version_label
+from durian_cli.banner import _format_context_length
+from durian_cli import __version__ as _DURIAN_VERSION, __release_date__ as _DURIAN_RELEASE_DATE
 
 _COMMAND_SPINNER_FRAMES = ("⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏")
 
@@ -1435,7 +1436,7 @@ def _build_compact_banner() -> str:
         line1 = f"{agent_name} - AI Agent Framework"
         tiny_line = agent_name
 
-    version_line = format_banner_version_label()
+    version_line = f"v{_DURIAN_VERSION} ({_DURIAN_RELEASE_DATE})"
 
     w = min(shutil.get_terminal_size().columns - 2, 88)
     if w < 30:
@@ -2968,7 +2969,7 @@ class DurianCLI:
             term_width = shutil.get_terminal_size().columns
             if term_width >= 95:
                 self.console.print()
-                self.console.print(DURIAN_AGENT_LOGO)
+                self.console.print(DURIAN_AGENT_LOGO + f"\n[dim #FFD700]v{_DURIAN_VERSION}  {_DURIAN_RELEASE_DATE}[/]")
                 self.console.print()
             return
 

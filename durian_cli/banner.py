@@ -515,8 +515,9 @@ def build_welcome_banner(console: Console, model: str, cwd: str,
     term_width = shutil.get_terminal_size().columns
     if term_width >= 95:
         _logo = _bskin.banner_logo if _bskin and hasattr(_bskin, 'banner_logo') and _bskin.banner_logo else DURIAN_AGENT_LOGO
-        import durian_cli as _dc
-        _version_tag = f"[dim #FFD700]v{_dc.__version__}  {_dc.__release_date__}[/]"
-        console.print(_logo + "  " + _version_tag)
+        # import durian_cli as _dc
+        # _version_tag = f"[dim #FFD700]v{_dc.__version__}  {_dc.__release_date__}[/]"
+        # console.print(_logo + "  " + _version_tag)
+        console.print(_logo)
         console.print()
     console.print(outer_panel)
