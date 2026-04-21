@@ -1123,6 +1123,18 @@ def select_provider_and_model(args=None):
         _model_flow_copilot_acp(config, current_model)
     elif selected_provider == "copilot":
         _model_flow_copilot(config, current_model)
+    elif selected_provider == "ollama":
+        _model_flow_local_server(config, "Ollama",
+                                 ["http://127.0.0.1:11434/v1", "http://localhost:11434/v1"])
+    elif selected_provider == "lmstudio":
+        _model_flow_local_server(config, "LM Studio",
+                                 ["http://127.0.0.1:1234/v1", "http://localhost:1234/v1"])
+    elif selected_provider == "vllm":
+        _model_flow_local_server(config, "vLLM",
+                                 ["http://0.0.0.0:1234/v1", "http://localhost:1234/v1"])
+    elif selected_provider == "llamacpp":
+        _model_flow_local_server(config, "llama.cpp",
+                                 ["http://127.0.0.1:8080/v1", "http://localhost:8080/v1"])
     elif selected_provider == "custom":
         _model_flow_custom(config)
     elif selected_provider.startswith("custom:") or selected_provider in _custom_provider_map:
@@ -1528,11 +1540,53 @@ def _model_flow_qwen_oauth(_config, current_model=""):
 
 
 
-def _model_flow_custom(config):
+def _model_flow_local_server(config, provider_name: str, default_urls: list[str]):
+    """Provider flow for local inference servers (Ollama, LM Studio, vLLM, llama.cpp).
+
+    Shows a short URL menu so the user can pick the default address or enter a
+    custom one, then delegates to ``_model_flow_custom`` with the chosen URL
+    pre-filled so they are not asked for it again.
+    """
+    print(f"\n{provider_name} local server configuration:")
+    print("Select the base URL for this server:\n")
+    choices = list(default_urls) + ["Enter a different URL"]
+    for i, choice in enumerate(choices, 1):
+        print(f"  {i}. {choice}")
+    print()
+    try:
+        raw = input(f"Choice [1-{len(choices)}]: ").strip()
+    except (KeyboardInterrupt, EOFError):
+        print("\nCancelled.")
+        return
+
+    if raw.isdigit() and 1 <= int(raw) <= len(default_urls):
+        chosen_url = default_urls[int(raw) - 1]
+    elif raw.isdigit() and int(raw) == len(choices):
+        try:
+            chosen_url = input("API base URL: ").strip()
+        except (KeyboardInterrupt, EOFError):
+            print("\nCancelled.")
+            return
+        if not chosen_url:
+            print("No URL provided. Cancelled.")
+            return
+    elif raw == "":
+        chosen_url = default_urls[0]
+    else:
+        print("Invalid choice. Cancelled.")
+        return
+
+    _model_flow_custom(config, prefill_url=chosen_url)
+
+
+def _model_flow_custom(config, prefill_url: str | None = None):
     """Custom endpoint: collect URL, API key, and model name.
 
     Automatically saves the endpoint to ``custom_providers`` in config.yaml
     so it appears in the provider menu on subsequent runs.
+
+    When *prefill_url* is provided (e.g. from a local-server shortcut) the URL
+    prompt is skipped and that value is used directly.
     """
     from durian_cli.auth import _save_model_choice, deactivate_provider
     from durian_cli.config import get_env_value, load_config, save_config
@@ -1547,13 +1601,23 @@ def _model_flow_custom(config):
         print(f"  Current key: {current_key[:8]}...")
     print()
 
-    try:
-        base_url = input(f"API base URL [{current_url or 'e.g. https://api.example.com/v1'}]: ").strip()
-        import getpass
-        api_key = getpass.getpass(f"API key [{current_key[:8] + '...' if current_key else 'optional'}]: ").strip()
-    except (KeyboardInterrupt, EOFError):
-        print("\nCancelled.")
-        return
+    if prefill_url is not None:
+        base_url = prefill_url
+        print(f"  Using URL: {base_url}")
+        try:
+            import getpass
+            api_key = getpass.getpass(f"API key [{current_key[:8] + '...' if current_key else 'optional, press Enter to skip'}]: ").strip()
+        except (KeyboardInterrupt, EOFError):
+            print("\nCancelled.")
+            return
+    else:
+        try:
+            base_url = input(f"API base URL [{current_url or 'e.g. https://api.example.com/v1'}]: ").strip()
+            import getpass
+            api_key = getpass.getpass(f"API key [{current_key[:8] + '...' if current_key else 'optional'}]: ").strip()
+        except (KeyboardInterrupt, EOFError):
+            print("\nCancelled.")
+            return
 
     if not base_url and not current_url:
         print("No URL provided. Cancelled.")

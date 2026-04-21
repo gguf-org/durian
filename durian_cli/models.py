@@ -513,6 +513,10 @@ class ProviderEntry(NamedTuple):
 
 
 CANONICAL_PROVIDERS: list[ProviderEntry] = [
+    ProviderEntry("ollama",         "Ollama",                   "Ollama (local — http://localhost:11434/v1)"),
+    ProviderEntry("lmstudio",       "LM Studio",                "LM Studio (local — http://localhost:1234/v1)"),
+    ProviderEntry("vllm",           "vLLM",                     "vLLM (local — http://localhost:1234/v1)"),
+    ProviderEntry("llamacpp",       "llama.cpp",                "llama.cpp (local — http://localhost:8080/v1)"),
     ProviderEntry("openrouter",     "OpenRouter",               "OpenRouter (100+ models, pay-per-use)"),
     ProviderEntry("anthropic",      "Anthropic",                "Anthropic (Claude models — API key or Claude Code)"),
     ProviderEntry("openai-codex",   "OpenAI Codex",             "OpenAI Codex"),
