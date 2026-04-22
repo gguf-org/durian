@@ -2080,8 +2080,12 @@ class DurianCLI:
             else:
                 context_label = "ctx --"
 
-            parts = [f"✷ {snapshot['model_short']}", context_label, percent_label]
-            parts.append(duration_label)
+            parts = [f"✷ {snapshot['model_short']}", context_label, percent_label, duration_label]
+            if width >= 90:
+                in_tok = snapshot["session_input_tokens"]
+                out_tok = snapshot["session_output_tokens"]
+                if in_tok > 0 or out_tok > 0:
+                    parts.append(f"↑{format_token_count_compact(in_tok)} ↓{format_token_count_compact(out_tok)}")
             return self._trim_status_bar_text(" │ ".join(parts), width)
         except Exception:
             return f"✷ {self.model if getattr(self, 'model', None) else 'Durian'}"
@@ -2129,6 +2133,8 @@ class DurianCLI:
                         context_label = "ctx --"
 
                     bar_style = self._status_bar_context_style(percent)
+                    in_tok = snapshot["session_input_tokens"]
+                    out_tok = snapshot["session_output_tokens"]
                     frags = [
                         ("class:status-bar", " ✷ "),
                         ("class:status-bar-strong", snapshot["model_short"]),
@@ -2140,8 +2146,18 @@ class DurianCLI:
                         (bar_style, percent_label),
                         ("class:status-bar-dim", " │ "),
                         ("class:status-bar-dim", duration_label),
-                        ("class:status-bar", " "),
                     ]
+                    if width >= 90 and (in_tok > 0 or out_tok > 0):
+                        in_label = format_token_count_compact(in_tok)
+                        out_label = format_token_count_compact(out_tok)
+                        frags += [
+                            ("class:status-bar-dim", " │ "),
+                            ("class:status-bar", "↑"),
+                            ("class:status-bar-dim", f" {in_label} "),
+                            ("class:status-bar", "↓"),
+                            ("class:status-bar-dim", f" {out_label}"),
+                        ]
+                    frags.append(("class:status-bar", " "))
 
             total_width = sum(self._status_bar_display_width(text) for _, text in frags)
             if total_width > width:
