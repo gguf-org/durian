@@ -27,8 +27,8 @@ class Colors:
     GREEN = "\033[32m"
     YELLOW = "\033[33m"
     BLUE = "\033[34m"
-    MAGENTA = "\033[35m"
-    CYAN = "\033[36m"
+    MAGENTA = "\033[38;5;208m"
+    CYAN = "\033[38;5;172m"
 
 
 def color(text: str, *codes) -> str:

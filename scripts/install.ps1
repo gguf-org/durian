@@ -37,17 +37,17 @@ $NodeVersion = "22"
 
 function Write-Banner {
     Write-Host ""
-    Write-Host "┌─────────────────────────────────────────────────────────┐" -ForegroundColor Magenta
-    Write-Host "│             🔸✷ Durian Agent Installer                  │" -ForegroundColor Magenta
-    Write-Host "├─────────────────────────────────────────────────────────┤" -ForegroundColor Magenta
-    Write-Host "│  An open source AI agent by gguf                        │" -ForegroundColor Magenta
-    Write-Host "└─────────────────────────────────────────────────────────┘" -ForegroundColor Magenta
+    Write-Host "┌─────────────────────────────────────────────────────────┐" -ForegroundColor Yellow
+    Write-Host "│             🔸✷ Durian Agent Installer                  │" -ForegroundColor Yellow
+    Write-Host "├─────────────────────────────────────────────────────────┤" -ForegroundColor Yellow
+    Write-Host "│  An open source AI agent by gguf                        │" -ForegroundColor Yellow
+    Write-Host "└─────────────────────────────────────────────────────────┘" -ForegroundColor Yellow
     Write-Host ""
 }
 
 function Write-Info {
     param([string]$Message)
-    Write-Host "→ $Message" -ForegroundColor Cyan
+    Write-Host "→ $Message" -ForegroundColor DarkYellow
 }
 
 function Write-Success {
@@ -824,7 +824,7 @@ function Write-Completion {
     Write-Host ""
     
     # Show file locations
-    Write-Host "📁 Your files:" -ForegroundColor Cyan
+    Write-Host "📁 Your files:" -ForegroundColor DarkYellow
     Write-Host ""
     Write-Host "   Config:    " -NoNewline -ForegroundColor Yellow
     Write-Host "$DurianHome\config.yaml"
@@ -836,9 +836,9 @@ function Write-Completion {
     Write-Host "$DurianHome\durian\"
     Write-Host ""
     
-    Write-Host "─────────────────────────────────────────────────────────" -ForegroundColor Cyan
+    Write-Host "─────────────────────────────────────────────────────────" -ForegroundColor DarkYellow
     Write-Host ""
-    Write-Host "🚀 Commands:" -ForegroundColor Cyan
+    Write-Host "🚀 Commands:" -ForegroundColor DarkYellow
     Write-Host ""
     Write-Host "   durian              " -NoNewline -ForegroundColor Green
     Write-Host "Start chatting"
@@ -854,7 +854,7 @@ function Write-Completion {
     Write-Host "Update to latest version"
     Write-Host ""
     
-    Write-Host "─────────────────────────────────────────────────────────" -ForegroundColor Cyan
+    Write-Host "─────────────────────────────────────────────────────────" -ForegroundColor DarkYellow
     Write-Host ""
     Write-Host "⚡ Restart your terminal for PATH changes to take effect" -ForegroundColor Yellow
     Write-Host ""

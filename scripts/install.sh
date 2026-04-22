@@ -20,8 +20,8 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-CYAN='\033[0;36m'
+MAGENTA='\033[38;5;208m'
+CYAN='\033[38;5;172m'
 NC='\033[0m' # No Color
 BOLD='\033[1m'
 
@@ -94,7 +94,7 @@ print_banner() {
     echo ""
     echo -e "${MAGENTA}${BOLD}"
     echo "┌─────────────────────────────────────────────────────────┐"
-    echo "│             ✷ Durian Agent Installer 🔸                │"
+    echo "│             ✷ Durian Agent Installer 🔸                 │"
     echo "├─────────────────────────────────────────────────────────┤"
     echo "│  An open source AI agent by gguf                        │"
     echo "└─────────────────────────────────────────────────────────┘"
@@ -1294,7 +1294,7 @@ print_success() {
     echo ""
     echo -e "${GREEN}${BOLD}"
     echo "┌─────────────────────────────────────────────────────────┐"
-    echo "│              ✓ Installation Complete! 🔸               │"
+    echo "│              ✓ Installation Complete! 🔸                │"
     echo "└─────────────────────────────────────────────────────────┘"
     echo -e "${NC}"
     echo ""
