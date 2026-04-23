@@ -746,13 +746,13 @@ class KawaiiSpinner:
             if self._upload_tokens:
                 try:
                     from agent.usage_pricing import format_token_count_compact as _ftc
-                    timer_part = f"↑ {_ftc(self._upload_tokens)} tokens | {elapsed_str}"
+                    timer_part = f"↑ {_ftc(self._upload_tokens)} · {elapsed_str}"
                 except Exception:
                     timer_part = elapsed_str
             elif self._download_tokens:
                 try:
                     from agent.usage_pricing import format_token_count_compact as _ftc
-                    timer_part = f"↓ {_ftc(self._download_tokens)} tokens | {elapsed_str}"
+                    timer_part = f"↓ {_ftc(self._download_tokens)} · {elapsed_str}"
                 except Exception:
                     timer_part = elapsed_str
             else:
