@@ -9110,7 +9110,19 @@ class DurianCLI:
                     elapsed_str = f"{_m}m {_s}s"
                 else:
                     elapsed_str = f"{elapsed:.1f}s"
-                frags.append(('class:hint', f'  ({elapsed_str})'))
+                _agent = getattr(cli_ref, 'agent', None)
+                if _is_heartbeat:
+                    _up = getattr(_agent, '_last_upload_tokens', 0) if _agent else 0
+                    if _up:
+                        frags.append(('class:hint', f'  (↑ {format_token_count_compact(_up)} tokens | {elapsed_str})'))
+                    else:
+                        frags.append(('class:hint', f'  ({elapsed_str})'))
+                else:
+                    _dn = getattr(_agent, '_last_download_tokens', 0) if _agent else 0
+                    if _dn:
+                        frags.append(('class:hint', f'  (↓ {format_token_count_compact(_dn)} tokens | {elapsed_str})'))
+                    else:
+                        frags.append(('class:hint', f'  ({elapsed_str})'))
             return frags
 
         def get_spinner_height():

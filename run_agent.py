@@ -1455,7 +1455,10 @@ class AIAgent:
         self.session_estimated_cost_usd = 0.0
         self.session_cost_status = "unknown"
         self.session_cost_source = "none"
-        
+        # Per-request token counts for processing indicator display
+        self._last_upload_tokens: int = 0
+        self._last_download_tokens: int = 0
+
         # ── Ollama num_ctx injection ──
         # Ollama defaults to 2048 context regardless of the model's capabilities.
         # When running against an Ollama server, detect the model's max context
@@ -1556,7 +1559,9 @@ class AIAgent:
         self.session_estimated_cost_usd = 0.0
         self.session_cost_status = "unknown"
         self.session_cost_source = "none"
-        
+        self._last_upload_tokens = 0
+        self._last_download_tokens = 0
+
         # Turn counter (added after reset_session_state was first written — #2635)
         self._user_turn_count = 0
 
@@ -8306,7 +8311,8 @@ class AIAgent:
             # Calculate approximate request size for logging
             total_chars = sum(len(str(msg)) for msg in api_messages)
             approx_tokens = estimate_messages_tokens_rough(api_messages)
-            
+            self._last_upload_tokens = approx_tokens
+
             # Thinking spinner for quiet mode (animated during API call)
             thinking_spinner = None
             
@@ -8328,6 +8334,7 @@ class AIAgent:
                     spinner_type = random.choice(['brain', 'sparkle', 'pulse', 'moon', 'star'])
                     thinking_spinner = KawaiiSpinner(f"{face} {verb}...", spinner_type=spinner_type, print_fn=self._print_fn)
                     thinking_spinner.start()
+                    thinking_spinner.set_upload_tokens(approx_tokens)
             
             # Log request details if verbose
             if self.verbose_logging:
@@ -8865,6 +8872,7 @@ class AIAgent:
                         self.session_api_calls += 1
                         self.session_input_tokens += canonical_usage.input_tokens
                         self.session_output_tokens += canonical_usage.output_tokens
+                        self._last_download_tokens = canonical_usage.output_tokens
                         self.session_cache_read_tokens += canonical_usage.cache_read_tokens
                         self.session_cache_write_tokens += canonical_usage.cache_write_tokens
                         self.session_reasoning_tokens += canonical_usage.reasoning_tokens

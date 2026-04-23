@@ -652,6 +652,8 @@ class KawaiiSpinner:
         self.frame_idx = 0
         self.start_time = None
         self.last_line_len = 0
+        self._upload_tokens: int = 0
+        self._download_tokens: int = 0
         # Optional callable to route all output through (e.g. a no-op for silent
         # background agents).  When set, bypasses self._out entirely so that
         # agents with _print_fn overridden remain fully silent.
@@ -735,15 +737,33 @@ class KawaiiSpinner:
             frame = self.spinner_frames[self.frame_idx % len(self.spinner_frames)]
             elapsed = t - self.start_time
             shimmer_msg = _shimmer_ansi(self.message, t)
-            # Compute visible length without ANSI codes for padding
-            plain_len = len(self.message)
+            if elapsed >= 60:
+                _m, _s = int(elapsed // 60), int(elapsed % 60)
+                elapsed_str = f"{_m}m {_s}s"
+            else:
+                elapsed_str = f"{elapsed:.1f}s"
+            # Build token+elapsed suffix
+            if self._upload_tokens:
+                try:
+                    from agent.usage_pricing import format_token_count_compact as _ftc
+                    timer_part = f"↑ {_ftc(self._upload_tokens)} tokens | {elapsed_str}"
+                except Exception:
+                    timer_part = elapsed_str
+            elif self._download_tokens:
+                try:
+                    from agent.usage_pricing import format_token_count_compact as _ftc
+                    timer_part = f"↓ {_ftc(self._download_tokens)} tokens | {elapsed_str}"
+                except Exception:
+                    timer_part = elapsed_str
+            else:
+                timer_part = elapsed_str
             if wings:
                 left, right = wings[self.frame_idx % len(wings)]
-                line = f"  {left} {frame} {shimmer_msg} {right} ({elapsed:.1f}s)"
-                plain_line_len = len(f"  {left} {frame} {self.message} {right} ({elapsed:.1f}s)")
+                line = f"  {left} {frame} {shimmer_msg} {right} ({timer_part})"
+                plain_line_len = len(f"  {left} {frame} {self.message} {right} ({timer_part})")
             else:
-                line = f"  {frame} {shimmer_msg} ({elapsed:.1f}s)"
-                plain_line_len = len(f"  {frame} {self.message} ({elapsed:.1f}s)")
+                line = f"  {frame} {shimmer_msg} ({timer_part})"
+                plain_line_len = len(f"  {frame} {self.message} ({timer_part})")
             pad = max(self.last_line_len - plain_line_len, 0)
             self._write(f"\r{line}{' ' * pad}", end='', flush=True)
             self.last_line_len = plain_line_len
@@ -757,6 +777,14 @@ class KawaiiSpinner:
         self.start_time = time.time()
         self.thread = threading.Thread(target=self._animate, daemon=True)
         self.thread.start()
+
+    def set_upload_tokens(self, n: int) -> None:
+        self._upload_tokens = n
+        self._download_tokens = 0
+
+    def set_download_tokens(self, n: int) -> None:
+        self._download_tokens = n
+        self._upload_tokens = 0
 
     def update_text(self, new_message: str):
         self.message = new_message
