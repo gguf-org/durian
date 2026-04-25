@@ -3276,6 +3276,71 @@ def set_config_value(key: str, value: str):
     print(f"✓ Set {key} = {value} in {config_path}")
 
 
+def unset_config_value(key: str):
+    """Remove a configuration or environment value."""
+    if is_managed():
+        managed_error("unset configuration values")
+        return
+    if not key:
+        print("Usage: durian config unset <key>")
+        return
+
+    upper_key = key.upper()
+    if (
+        upper_key in OPTIONAL_ENV_VARS
+        or upper_key in _EXTRA_ENV_KEYS
+        or upper_key.endswith(("_API_KEY", "_TOKEN"))
+        or upper_key.startswith("TERMINAL_SSH")
+    ):
+        removed = remove_env_value(upper_key)
+        if removed:
+            print(f"✓ Removed {upper_key} from {get_env_path()}")
+        else:
+            print(f"{upper_key} was not set in {get_env_path()}")
+        return
+
+    config_path = get_config_path()
+    if not config_path.exists():
+        print(f"{key} was not set in {config_path}")
+        return
+
+    try:
+        with open(config_path, encoding="utf-8") as f:
+            user_config = yaml.safe_load(f) or {}
+    except Exception:
+        user_config = {}
+
+    parts = key.split(".")
+    current = user_config
+    for part in parts[:-1]:
+        if not isinstance(current, dict) or part not in current:
+            print(f"{key} was not set in {config_path}")
+            return
+        current = current[part]
+
+    if not isinstance(current, dict) or parts[-1] not in current:
+        print(f"{key} was not set in {config_path}")
+        return
+
+    del current[parts[-1]]
+
+    # Remove empty parent dictionaries left by dotted-key deletion.
+    def _prune_empty_dicts(node):
+        if not isinstance(node, dict):
+            return False
+        for child_key in list(node.keys()):
+            if _prune_empty_dicts(node[child_key]):
+                del node[child_key]
+        return not node
+
+    _prune_empty_dicts(user_config)
+
+    ensure_durian_home()
+    from utils import atomic_yaml_write
+    atomic_yaml_write(config_path, user_config, sort_keys=False)
+    print(f"✓ Removed {key} from {config_path}")
+
+
 # =============================================================================
 # Command handler
 # =============================================================================
@@ -3302,6 +3367,18 @@ def config_command(args):
             print("  durian config set OPENROUTER_API_KEY sk-or-...")
             sys.exit(1)
         set_config_value(key, value)
+
+    elif subcmd == "unset":
+        key = getattr(args, 'key', None)
+        if not key:
+            print("Usage: durian config unset <key>")
+            print()
+            print("Examples:")
+            print("  durian config unset OPENROUTER_API_KEY")
+            print("  durian config unset ANTHROPIC_API_KEY")
+            print("  durian config unset model.api_key")
+            sys.exit(1)
+        unset_config_value(key)
     
     elif subcmd == "path":
         print(get_config_path())
@@ -3410,6 +3487,7 @@ def config_command(args):
         print("  durian config           Show current configuration")
         print("  durian config edit      Open config in editor")
         print("  durian config set <key> <value>   Set a config value")
+        print("  durian config unset <key>         Remove a config or .env value")
         print("  durian config check     Check for missing/outdated config")
         print("  durian config migrate   Update config with new options")
         print("  durian config path      Show config file path")

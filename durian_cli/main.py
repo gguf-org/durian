@@ -1232,28 +1232,71 @@ def _prompt_provider_choice(choices, *, default=0):
             return None
 
 
+def _prompt_api_key_for_provider(provider_name: str, key_env: str, existing_key: str = "") -> tuple[str, bool]:
+    """Return (api_key, continue_flow) after letting the user keep, replace, or remove a saved key."""
+    from durian_cli.config import remove_env_value, save_env_value
+
+    existing_key = existing_key or ""
+    if existing_key:
+        print(f"  {provider_name} API key: {existing_key[:8]}... ✓")
+        print()
+        print("    1. Use existing API key")
+        print("    2. Replace saved API key")
+        print("    3. Remove saved API key")
+        print("    4. Cancel")
+        print()
+        try:
+            choice = input("  Choice [1/2/3/4]: ").strip()
+        except (KeyboardInterrupt, EOFError):
+            choice = "1"
+
+        if choice in ("", "1"):
+            print()
+            return existing_key, True
+        if choice == "3":
+            removed = remove_env_value(key_env)
+            print(f"  {'Removed' if removed else 'No saved value for'} {key_env}.")
+            print()
+            return "", False
+        if choice == "4":
+            return existing_key, False
+        if choice != "2":
+            print("  Invalid choice. No change.")
+            return existing_key, False
+    else:
+        print(f"No {provider_name} API key configured.")
+
+    if not key_env:
+        return existing_key, True
+
+    try:
+        import getpass
+        new_key = getpass.getpass(f"{key_env} (or Enter to cancel): ").strip()
+    except (KeyboardInterrupt, EOFError):
+        print()
+        return existing_key, False
+    if not new_key:
+        print("Cancelled.")
+        return existing_key, False
+
+    save_env_value(key_env, new_key)
+    print("API key saved.")
+    print()
+    return new_key, True
+
+
 def _model_flow_openrouter(config, current_model=""):
     """OpenRouter provider: ensure API key, then pick model."""
     from durian_cli.auth import _prompt_model_selection, _save_model_choice, deactivate_provider
-    from durian_cli.config import get_env_value, save_env_value
+    from durian_cli.config import get_env_value
 
     api_key = get_env_value("OPENROUTER_API_KEY")
     if not api_key:
-        print("No OpenRouter API key configured.")
         print("Get one at: https://openrouter.ai/keys")
         print()
-        try:
-            import getpass
-            key = getpass.getpass("OpenRouter API key (or Enter to cancel): ").strip()
-        except (KeyboardInterrupt, EOFError):
-            print()
-            return
-        if not key:
-            print("Cancelled.")
-            return
-        save_env_value("OPENROUTER_API_KEY", key)
-        print("API key saved.")
-        print()
+    api_key, should_continue = _prompt_api_key_for_provider("OpenRouter", "OPENROUTER_API_KEY", api_key)
+    if not should_continue or not api_key:
+        return
 
     from durian_cli.models import model_ids, get_pricing_for_provider
     openrouter_models = model_ids(force_refresh=True)
@@ -2415,27 +2458,12 @@ def _model_flow_kimi(config, current_model=""):
     for ev in pconfig.api_key_env_vars:
         existing_key = get_env_value(ev) or os.getenv(ev, "")
         if existing_key:
+            key_env = ev
             break
 
-    if not existing_key:
-        print(f"No {pconfig.name} API key configured.")
-        if key_env:
-            try:
-                import getpass
-                new_key = getpass.getpass(f"{key_env} (or Enter to cancel): ").strip()
-            except (KeyboardInterrupt, EOFError):
-                print()
-                return
-            if not new_key:
-                print("Cancelled.")
-                return
-            save_env_value(key_env, new_key)
-            existing_key = new_key
-            print("API key saved.")
-            print()
-    else:
-        print(f"  {pconfig.name} API key: {existing_key[:8]}... ✓")
-        print()
+    existing_key, should_continue = _prompt_api_key_for_provider(pconfig.name, key_env, existing_key)
+    if not should_continue or not existing_key:
+        return
 
     # Step 2: Auto-detect endpoint from key prefix
     is_coding_plan = existing_key.startswith("sk-kimi-")
@@ -2510,26 +2538,12 @@ def _model_flow_api_key_provider(config, provider_id, current_model=""):
     for ev in pconfig.api_key_env_vars:
         existing_key = get_env_value(ev) or os.getenv(ev, "")
         if existing_key:
+            key_env = ev
             break
 
-    if not existing_key:
-        print(f"No {pconfig.name} API key configured.")
-        if key_env:
-            try:
-                import getpass
-                new_key = getpass.getpass(f"{key_env} (or Enter to cancel): ").strip()
-            except (KeyboardInterrupt, EOFError):
-                print()
-                return
-            if not new_key:
-                print("Cancelled.")
-                return
-            save_env_value(key_env, new_key)
-            print("API key saved.")
-            print()
-    else:
-        print(f"  {pconfig.name} API key: {existing_key[:8]}... ✓")
-        print()
+    existing_key, should_continue = _prompt_api_key_for_provider(pconfig.name, key_env, existing_key)
+    if not should_continue or not existing_key:
+        return
 
     # Optional base URL override
     current_base = ""
@@ -2736,6 +2750,7 @@ def _model_flow_anthropic(config, current_model=""):
 
     has_creds = bool(existing_key) or cc_available
     needs_auth = not has_creds
+    forced_auth_method = ""
 
     if has_creds:
         # Show what we found
@@ -2745,34 +2760,53 @@ def _model_flow_anthropic(config, current_model=""):
             print("  Claude Code credentials: ✓ (auto-detected)")
         print()
         print("    1. Use existing credentials")
-        print("    2. Reauthenticate (new OAuth login)")
-        print("    3. Cancel")
+        print("    2. Reauthenticate with OAuth")
+        print("    3. Replace with Anthropic API key")
+        print("    4. Remove saved Anthropic API key/token")
+        print("    5. Cancel")
         print()
         try:
-            choice = input("  Choice [1/2/3]: ").strip()
+            choice = input("  Choice [1/2/3/4/5]: ").strip()
         except (KeyboardInterrupt, EOFError):
             choice = "1"
 
         if choice == "2":
             needs_auth = True
+            forced_auth_method = "oauth"
         elif choice == "3":
+            needs_auth = True
+            forced_auth_method = "api_key"
+        elif choice == "4":
+            from durian_cli.config import remove_env_value
+            removed_key = remove_env_value("ANTHROPIC_API_KEY")
+            removed_token = remove_env_value("ANTHROPIC_TOKEN")
+            if removed_key or removed_token:
+                print("  Removed saved Anthropic credentials from .env.")
+            else:
+                print("  No saved Anthropic API key/token found in .env.")
+            if cc_available:
+                print("  Claude Code credentials are still available in Claude's credential store.")
+            return
+        elif choice == "5":
             return
         # choice == "1" or default: use existing, proceed to model selection
 
     if needs_auth:
-        # Show auth method choice
-        print()
-        print("  Choose authentication method:")
-        print()
-        print("    1. Claude Pro/Max subscription (OAuth login)")
-        print("    2. Anthropic API key (pay-per-token)")
-        print("    3. Cancel")
-        print()
-        try:
-            choice = input("  Choice [1/2/3]: ").strip()
-        except (KeyboardInterrupt, EOFError):
+        choice = "1" if forced_auth_method == "oauth" else "2" if forced_auth_method == "api_key" else ""
+        if not choice:
+            # Show auth method choice
             print()
-            return
+            print("  Choose authentication method:")
+            print()
+            print("    1. Claude Pro/Max subscription (OAuth login)")
+            print("    2. Anthropic API key (pay-per-token)")
+            print("    3. Cancel")
+            print()
+            try:
+                choice = input("  Choice [1/2/3]: ").strip()
+            except (KeyboardInterrupt, EOFError):
+                print()
+                return
 
         if choice == "1":
             if not _run_anthropic_oauth_flow(save_env_value):
@@ -5241,6 +5275,10 @@ Examples:
     config_set = config_subparsers.add_parser("set", help="Set a configuration value")
     config_set.add_argument("key", nargs="?", help="Configuration key (e.g., model, terminal.backend)")
     config_set.add_argument("value", nargs="?", help="Value to set")
+
+    # config unset
+    config_unset = config_subparsers.add_parser("unset", aliases=["remove", "rm"], help="Remove a configuration or .env value")
+    config_unset.add_argument("key", nargs="?", help="Configuration or environment key to remove")
     
     # config path
     config_subparsers.add_parser("path", help="Print config file path")
