@@ -58,6 +58,12 @@ DURIAN_OVERLAYS: Dict[str, DurianOverlay] = {
         auth_type="oauth_external",
         base_url_override="https://chatgpt.com/backend-api/codex",
     ),
+    "openai-codex-api": DurianOverlay(
+        transport="codex_responses",
+        extra_env_vars=("OPENAI_API_KEY",),
+        base_url_override="https://api.openai.com/v1",
+        base_url_env_var="OPENAI_CODEX_BASE_URL",
+    ),
     "qwen-oauth": DurianOverlay(
         transport="openai_chat",
         auth_type="oauth_external",
@@ -170,6 +176,9 @@ class ProviderDef:
 ALIASES: Dict[str, str] = {
     # openrouter
     "openai": "openrouter",     # bare "openai" → route through aggregator
+    "openai-api": "openai-codex-api",
+    "openai-direct": "openai-codex-api",
+    "openai-codex-direct": "openai-codex-api",
 
     # zai
     "glm": "zai",
@@ -259,6 +268,7 @@ ALIASES: Dict[str, str] = {
 _LABEL_OVERRIDES: Dict[str, str] = {
     "nous": "Nous Portal",
     "openai-codex": "OpenAI Codex",
+    "openai-codex-api": "OpenAI Codex (direct API)",
     "copilot-acp": "GitHub Copilot ACP",
     "xiaomi": "Xiaomi MiMo",
     "local": "Local endpoint",

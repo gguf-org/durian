@@ -1117,6 +1117,8 @@ def select_provider_and_model(args=None):
         _model_flow_nous(config, current_model, args=args)
     elif selected_provider == "openai-codex":
         _model_flow_openai_codex(config, current_model)
+    elif selected_provider == "openai-codex-api":
+        _model_flow_api_key_provider(config, selected_provider, current_model)
     elif selected_provider == "qwen-oauth":
         _model_flow_qwen_oauth(config, current_model)
     elif selected_provider == "copilot-acp":
@@ -2609,6 +2611,8 @@ def _model_flow_api_key_provider(config, provider_id, current_model=""):
         model["base_url"] = effective_base
         if provider_id in {"opencode-zen", "opencode-go"}:
             model["api_mode"] = opencode_model_api_mode(provider_id, selected)
+        elif provider_id == "openai-codex-api":
+            model["api_mode"] = "codex_responses"
         else:
             model.pop("api_mode", None)
         save_config(cfg)
@@ -4683,7 +4687,7 @@ For more help on a command:
     )
     chat_parser.add_argument(
         "--provider",
-        choices=["auto", "openrouter", "nous", "openai-codex", "copilot-acp", "copilot", "anthropic", "gemini", "huggingface", "zai", "kimi-coding", "kimi-coding-cn", "minimax", "minimax-cn", "kilocode", "xiaomi", "arcee"],
+        choices=["auto", "openrouter", "nous", "openai-codex", "openai-codex-api", "copilot-acp", "copilot", "anthropic", "gemini", "huggingface", "zai", "kimi-coding", "kimi-coding-cn", "minimax", "minimax-cn", "kilocode", "xiaomi", "arcee"],
         default=None,
         help="Inference provider (default: auto)"
     )
@@ -4972,7 +4976,7 @@ For more help on a command:
     )
     auth_subparsers = auth_parser.add_subparsers(dest="auth_action")
     auth_add = auth_subparsers.add_parser("add", help="Add a pooled credential")
-    auth_add.add_argument("provider", help="Provider id (for example: anthropic, openai-codex, openrouter)")
+    auth_add.add_argument("provider", help="Provider id (for example: anthropic, openai-codex, openai-codex-api, openrouter)")
     auth_add.add_argument("--type", dest="auth_type", choices=["oauth", "api-key", "api_key"], help="Credential type to add")
     auth_add.add_argument("--label", help="Optional display label")
     auth_add.add_argument("--api-key", help="API key value (otherwise prompted securely)")

@@ -30,7 +30,7 @@ _ENV_VAR_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 # Env var names written to .env that aren't in OPTIONAL_ENV_VARS
 # (managed by setup/provider flows directly).
 _EXTRA_ENV_KEYS = frozenset({
-    "OPENAI_API_KEY", "OPENAI_BASE_URL",
+    "OPENAI_API_KEY", "OPENAI_BASE_URL", "OPENAI_CODEX_BASE_URL",
     "ANTHROPIC_API_KEY", "ANTHROPIC_TOKEN",
     "DISCORD_HOME_CHANNEL", "TELEGRAM_HOME_CHANNEL",
     "SIGNAL_ACCOUNT", "SIGNAL_HTTP_URL",
@@ -2540,6 +2540,7 @@ _FALLBACK_COMMENT = """
 # Supported providers:
 #   openrouter   (OPENROUTER_API_KEY)  — routes to any model
 #   openai-codex (OAuth — durian auth) — OpenAI Codex
+#   openai-codex-api (OPENAI_API_KEY) — OpenAI Codex direct API
 #   nous         (OAuth — durian auth) — Nous Portal
 #   zai          (ZAI_API_KEY)         — Z.AI / GLM
 #   kimi-coding  (KIMI_API_KEY)        — Kimi / Moonshot
@@ -2584,6 +2585,7 @@ _COMMENTED_SECTIONS = """
 # Supported providers:
 #   openrouter   (OPENROUTER_API_KEY)  — routes to any model
 #   openai-codex (OAuth — durian auth) — OpenAI Codex
+#   openai-codex-api (OPENAI_API_KEY) — OpenAI Codex direct API
 #   nous         (OAuth — durian auth) — Nous Portal
 #   zai          (ZAI_API_KEY)         — Z.AI / GLM
 #   kimi-coding  (KIMI_API_KEY)        — Kimi / Moonshot

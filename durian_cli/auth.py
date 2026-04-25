@@ -67,6 +67,7 @@ DEFAULT_AGENT_KEY_MIN_TTL_SECONDS = 30 * 60  # 30 minutes
 ACCESS_TOKEN_REFRESH_SKEW_SECONDS = 120       # refresh 2 min before expiry
 DEVICE_AUTH_POLL_INTERVAL_CAP_SECONDS = 1     # poll at most every 1s
 DEFAULT_CODEX_BASE_URL = "https://chatgpt.com/backend-api/codex"
+DEFAULT_OPENAI_CODEX_API_BASE_URL = "https://api.openai.com/v1"
 DEFAULT_QWEN_BASE_URL = "https://portal.qwen.ai/v1"
 DEFAULT_GITHUB_MODELS_BASE_URL = "https://api.githubcopilot.com"
 DEFAULT_COPILOT_ACP_BASE_URL = "acp://copilot"
@@ -114,6 +115,14 @@ PROVIDER_REGISTRY: Dict[str, ProviderConfig] = {
         name="OpenAI Codex",
         auth_type="oauth_external",
         inference_base_url=DEFAULT_CODEX_BASE_URL,
+    ),
+    "openai-codex-api": ProviderConfig(
+        id="openai-codex-api",
+        name="OpenAI Codex (direct API)",
+        auth_type="api_key",
+        inference_base_url=DEFAULT_OPENAI_CODEX_API_BASE_URL,
+        api_key_env_vars=("OPENAI_API_KEY",),
+        base_url_env_var="OPENAI_CODEX_BASE_URL",
     ),
     "qwen-oauth": ProviderConfig(
         id="qwen-oauth",
@@ -916,6 +925,8 @@ def resolve_provider(
         "arcee-ai": "arcee", "arceeai": "arcee",
         "minimax-china": "minimax-cn", "minimax_cn": "minimax-cn",
         "claude": "anthropic", "claude-code": "anthropic",
+        "openai-api": "openai-codex-api", "openai-direct": "openai-codex-api",
+        "openai-codex-direct": "openai-codex-api",
         "github": "copilot", "github-copilot": "copilot",
         "github-models": "copilot", "github-model": "copilot",
         "github-copilot-acp": "copilot-acp", "copilot-acp-agent": "copilot-acp",

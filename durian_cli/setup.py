@@ -75,6 +75,12 @@ _DEFAULT_PROVIDER_MODELS = {
     "copilot-acp": [
         "copilot-acp",
     ],
+    "openai-codex-api": [
+        "gpt-5.4",
+        "gpt-5.4-mini",
+        "gpt-5.3-codex",
+        "gpt-5.2-codex",
+    ],
     "copilot": [
         "gpt-5.4",
         "gpt-5.4-mini",

@@ -14,6 +14,7 @@ from agent.credential_pool import CredentialPool, PooledCredential, get_custom_p
 from durian_cli.auth import (
     AuthError,
     DEFAULT_CODEX_BASE_URL,
+    DEFAULT_OPENAI_CODEX_API_BASE_URL,
     DEFAULT_QWEN_BASE_URL,
     PROVIDER_REGISTRY,
     _agent_key_is_usable,
@@ -151,6 +152,9 @@ def _resolve_runtime_from_pool_entry(
     if provider == "openai-codex":
         api_mode = "codex_responses"
         base_url = base_url or DEFAULT_CODEX_BASE_URL
+    elif provider == "openai-codex-api":
+        api_mode = "codex_responses"
+        base_url = base_url or DEFAULT_OPENAI_CODEX_API_BASE_URL
     elif provider == "qwen-oauth":
         api_mode = "chat_completions"
         base_url = base_url or DEFAULT_QWEN_BASE_URL
@@ -627,6 +631,8 @@ def _resolve_explicit_runtime(
         api_mode = "chat_completions"
         if provider == "copilot":
             api_mode = _copilot_runtime_api_mode(model_cfg, api_key)
+        elif provider == "openai-codex-api":
+            api_mode = "codex_responses"
         else:
             configured_mode = _parse_api_mode(model_cfg.get("api_mode"))
             if configured_mode:
@@ -852,6 +858,8 @@ def resolve_runtime_provider(
         api_mode = "chat_completions"
         if provider == "copilot":
             api_mode = _copilot_runtime_api_mode(model_cfg, creds.get("api_key", ""))
+        elif provider == "openai-codex-api":
+            api_mode = "codex_responses"
         else:
             configured_provider = str(model_cfg.get("provider") or "").strip().lower()
             # Only honor persisted api_mode when it belongs to the same provider family.

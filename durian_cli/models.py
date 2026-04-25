@@ -103,6 +103,7 @@ _PROVIDER_MODELS: dict[str, list[str]] = {
         "openrouter/elephant-alpha",
     ],
     "openai-codex": _codex_curated_models(),
+    "openai-codex-api": _codex_curated_models(),
     "copilot-acp": [
         "copilot-acp",
     ],
@@ -519,7 +520,8 @@ CANONICAL_PROVIDERS: list[ProviderEntry] = [
     ProviderEntry("llamacpp",       "llama.cpp",                "llama.cpp (local — http://localhost:8080/v1)"),
     ProviderEntry("openrouter",     "OpenRouter",               "OpenRouter (100+ models, pay-per-use)"),
     ProviderEntry("anthropic",      "Anthropic",                "Anthropic (Claude models — API key or Claude Code)"),
-    ProviderEntry("openai-codex",   "OpenAI Codex",             "OpenAI Codex"),
+    ProviderEntry("openai-codex",   "OpenAI Codex",             "OpenAI Codex (ChatGPT account login)"),
+    ProviderEntry("openai-codex-api", "OpenAI Codex (direct API)", "OpenAI Codex (direct OpenAI API key)"),
     ProviderEntry("xiaomi",         "Xiaomi MiMo",              "Xiaomi MiMo (MiMo-V2 models — pro, omni, flash)"),
     ProviderEntry("qwen-oauth",     "Qwen OAuth (Portal)",      "Qwen OAuth (reuses local Qwen CLI login)"),
     ProviderEntry("copilot",        "GitHub Copilot",           "GitHub Copilot (uses GITHUB_TOKEN or gh auth token)"),
@@ -569,6 +571,9 @@ _PROVIDER_ALIASES = {
     "minimax_cn": "minimax-cn",
     "claude": "anthropic",
     "claude-code": "anthropic",
+    "openai-api": "openai-codex-api",
+    "openai-direct": "openai-codex-api",
+    "openai-codex-direct": "openai-codex-api",
     "deep-seek": "deepseek",
     "opencode": "opencode-zen",
     "zen": "opencode-zen",
@@ -1226,7 +1231,7 @@ def provider_model_ids(provider: Optional[str], *, force_refresh: bool = False) 
     normalized = normalize_provider(provider)
     if normalized == "openrouter":
         return model_ids(force_refresh=force_refresh)
-    if normalized == "openai-codex":
+    if normalized in {"openai-codex", "openai-codex-api"}:
         from durian_cli.codex_models import get_codex_model_ids
 
         return get_codex_model_ids()
@@ -1875,9 +1880,9 @@ def validate_requested_model(
         }
 
     # OpenAI Codex has its own catalog path; /v1/models probing is not the right validation path.
-    if normalized == "openai-codex":
+    if normalized in {"openai-codex", "openai-codex-api"}:
         try:
-            codex_models = provider_model_ids("openai-codex")
+            codex_models = provider_model_ids(normalized)
         except Exception:
             codex_models = []
         if codex_models:

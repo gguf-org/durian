@@ -1620,7 +1620,7 @@ class DurianCLI:
         Args:
             model: Model to use (default: from env or claude-sonnet)
             toolsets: List of toolsets to enable (default: all)
-            provider: Inference provider ("auto", "openrouter", "nous", "openai-codex", "zai", "kimi-coding", "minimax", "minimax-cn")
+            provider: Inference provider ("auto", "openrouter", "nous", "openai-codex", "openai-codex-api", "zai", "kimi-coding", "minimax", "minimax-cn")
             api_key: API key (default: from environment)
             base_url: API base URL (default: OpenRouter)
             max_turns: Maximum tool-calling iterations shared with subagents (default: 90)
@@ -2236,7 +2236,7 @@ class DurianCLI:
                 pass
             return changed
 
-        if resolved_provider != "openai-codex":
+        if resolved_provider not in {"openai-codex", "openai-codex-api"}:
             return changed
 
         # 1. Strip provider prefix ("openai/gpt-5.4" → "gpt-5.4")
@@ -9926,7 +9926,7 @@ def main(
         toolsets: Comma-separated list of toolsets to enable (e.g., "web,terminal")
         skills: Comma-separated or repeated list of skills to preload for the session
         model: Model to use (default: anthropic/claude-opus-4-20250514)
-        provider: Inference provider ("auto", "openrouter", "nous", "openai-codex", "zai", "kimi-coding", "minimax", "minimax-cn")
+            provider: Inference provider ("auto", "openrouter", "nous", "openai-codex", "openai-codex-api", "zai", "kimi-coding", "minimax", "minimax-cn")
         api_key: API key for authentication
         base_url: Base URL for the API
         max_turns: Maximum tool-calling iterations (default: 60)
