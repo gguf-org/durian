@@ -1027,8 +1027,9 @@ def _prune_orphaned_branches(repo_root: str) -> None:
 _ACCENT_ANSI_DEFAULT = "\033[1;38;2;255;215;0m"  # True-color #FFD700 bold — fallback
 _BOLD = "\033[1m"
 _RST = "\033[0m"
-_RESPONSE_PREFIX = "✷ Durian: "
-_RESPONSE_SUFFIX = " ✷"
+# _RESPONSE_PREFIX = "✷ Durian: "
+_RESPONSE_PREFIX = "✷ "
+_RESPONSE_SUFFIX = " 𖦹"
 
 
 def _hex_to_ansi(hex_color: str, *, bold: bool = False) -> str:
