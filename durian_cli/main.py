@@ -218,7 +218,10 @@ def _has_any_provider_configured() -> bool:
     from durian_cli.auth import PROVIDER_REGISTRY
 
     # Collect all provider env vars
-    provider_env_vars = {"OPENROUTER_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_TOKEN", "OPENAI_BASE_URL"}
+    provider_env_vars = {
+        "OPENROUTER_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
+        "ANTHROPIC_TOKEN", "OPENAI_BASE_URL", "CUSTOM_API_KEY",
+    }
     for pconfig in PROVIDER_REGISTRY.values():
         if pconfig.auth_type == "api_key":
             provider_env_vars.update(pconfig.api_key_env_vars)
@@ -1624,6 +1627,115 @@ def _model_flow_local_server(config, provider_name: str, default_urls: list[str]
     _model_flow_custom(config, prefill_url=chosen_url)
 
 
+def _current_custom_endpoint_state(config) -> tuple[str, str, str]:
+    """Return (base_url, api_key, key_source) for the manually configured custom endpoint."""
+    from durian_cli.config import get_env_value
+
+    model = config.get("model")
+    current_url = ""
+    current_key = ""
+    key_source = ""
+    if isinstance(model, dict) and str(model.get("provider", "")).strip().lower() == "custom":
+        current_url = str(model.get("base_url", "") or "").strip()
+        current_key = str(model.get("api_key", "") or "").strip()
+        if current_key:
+            key_source = "config model.api_key"
+
+    if not current_url:
+        current_url = get_env_value("OPENAI_BASE_URL") or ""
+
+    if not current_key and current_url:
+        for entry in config.get("custom_providers") or []:
+            if not isinstance(entry, dict):
+                continue
+            if str(entry.get("base_url", "") or "").rstrip("/") != current_url.rstrip("/"):
+                continue
+            current_key = str(entry.get("api_key", "") or "").strip()
+            if current_key:
+                key_source = "saved custom provider"
+                break
+
+    if not current_key:
+        current_key = get_env_value("CUSTOM_API_KEY") or ""
+        if current_key:
+            key_source = "CUSTOM_API_KEY"
+
+    return current_url, current_key, key_source
+
+
+def _remove_custom_endpoint_api_key(base_url: str = "") -> bool:
+    """Remove stored custom endpoint API keys without touching OPENAI_API_KEY."""
+    from durian_cli.config import load_config, remove_env_value, save_config
+
+    removed = remove_env_value("CUSTOM_API_KEY")
+    cfg = load_config()
+    model = cfg.get("model")
+    if isinstance(model, dict) and str(model.get("provider", "")).strip().lower() == "custom":
+        if "api_key" in model:
+            model.pop("api_key", None)
+            removed = True
+
+    providers = cfg.get("custom_providers")
+    if isinstance(providers, list):
+        for entry in providers:
+            if not isinstance(entry, dict) or "api_key" not in entry:
+                continue
+            if base_url and str(entry.get("base_url", "") or "").rstrip("/") != base_url.rstrip("/"):
+                continue
+            entry.pop("api_key", None)
+            removed = True
+
+    if removed:
+        save_config(cfg)
+    return removed
+
+
+def _prompt_custom_api_key(current_key: str, key_source: str, current_url: str) -> tuple[str, bool]:
+    """Return (api_key, continue_flow) for the manual custom endpoint key prompt."""
+    if current_key:
+        source = f" ({key_source})" if key_source else ""
+        print(f"  Current custom API key{source}: {current_key[:8]}... ✓")
+        print()
+        print("    1. Use existing custom API key")
+        print("    2. Replace custom API key")
+        print("    3. Remove stored custom API key")
+        print("    4. Continue without an API key")
+        print("    5. Cancel")
+        print()
+        try:
+            choice = input("  Choice [1/2/3/4/5]: ").strip()
+        except (KeyboardInterrupt, EOFError):
+            choice = "1"
+
+        if choice in ("", "1"):
+            print()
+            return current_key, True
+        if choice == "3":
+            removed = _remove_custom_endpoint_api_key(current_url)
+            print(f"  {'Removed' if removed else 'No saved custom API key found'}.")
+            print()
+            return "", True
+        if choice == "4":
+            _remove_custom_endpoint_api_key(current_url)
+            print()
+            return "", True
+        if choice == "5":
+            return current_key, False
+        if choice != "2":
+            print("  Invalid choice. No change.")
+            return current_key, False
+
+    try:
+        import getpass
+        prompt = "Custom endpoint API key [optional, press Enter to skip]: "
+        new_key = getpass.getpass(prompt).strip()
+    except (KeyboardInterrupt, EOFError):
+        print()
+        return current_key, False
+    print()
+    return new_key, True
+
+
 def _model_flow_custom(config, prefill_url: str | None = None):
     """Custom endpoint: collect URL, API key, and model name.
 
@@ -1634,34 +1746,31 @@ def _model_flow_custom(config, prefill_url: str | None = None):
     prompt is skipped and that value is used directly.
     """
     from durian_cli.auth import _save_model_choice, deactivate_provider
-    from durian_cli.config import get_env_value, load_config, save_config
+    from durian_cli.config import load_config, save_config
 
-    current_url = get_env_value("OPENAI_BASE_URL") or ""
-    current_key = get_env_value("OPENAI_API_KEY") or ""
+    current_url, current_key, key_source = _current_custom_endpoint_state(config)
 
     print("Custom OpenAI-compatible endpoint configuration:")
     if current_url:
         print(f"  Current URL: {current_url}")
-    if current_key:
-        print(f"  Current key: {current_key[:8]}...")
     print()
 
     if prefill_url is not None:
         base_url = prefill_url
         print(f"  Using URL: {base_url}")
-        try:
-            import getpass
-            api_key = getpass.getpass(f"API key [{current_key[:8] + '...' if current_key else 'optional, press Enter to skip'}]: ").strip()
-        except (KeyboardInterrupt, EOFError):
-            print("\nCancelled.")
+        api_key, continue_flow = _prompt_custom_api_key(current_key, key_source, current_url or base_url)
+        if not continue_flow:
+            print("Cancelled.")
             return
     else:
         try:
             base_url = input(f"API base URL [{current_url or 'e.g. https://api.example.com/v1'}]: ").strip()
-            import getpass
-            api_key = getpass.getpass(f"API key [{current_key[:8] + '...' if current_key else 'optional'}]: ").strip()
         except (KeyboardInterrupt, EOFError):
             print("\nCancelled.")
+            return
+        api_key, continue_flow = _prompt_custom_api_key(current_key, key_source, current_url or base_url)
+        if not continue_flow:
+            print("Cancelled.")
             return
 
     if not base_url and not current_url:
@@ -1674,7 +1783,7 @@ def _model_flow_custom(config, prefill_url: str | None = None):
         print(f"Invalid URL: {effective_url} (must start with http:// or https://)")
         return
 
-    effective_key = api_key or current_key
+    effective_key = api_key
 
     from durian_cli.models import probe_api_models
 
@@ -1759,6 +1868,8 @@ def _model_flow_custom(config, prefill_url: str | None = None):
         model["base_url"] = effective_url
         if effective_key:
             model["api_key"] = effective_key
+        else:
+            model.pop("api_key", None)
         model.pop("api_mode", None)  # let runtime auto-detect from URL
         save_config(cfg)
         deactivate_provider()
@@ -1782,6 +1893,8 @@ def _model_flow_custom(config, prefill_url: str | None = None):
         _caller_model["base_url"] = effective_url
         if effective_key:
             _caller_model["api_key"] = effective_key
+        else:
+            _caller_model.pop("api_key", None)
         _caller_model.pop("api_mode", None)
         config["model"] = _caller_model
         print("Endpoint saved. Use `/model` in chat or `durian model` to set a model.")
@@ -1830,6 +1943,9 @@ def _save_custom_provider(base_url, api_key="", model="", context_length=None,
     for entry in providers:
         if isinstance(entry, dict) and entry.get("base_url", "").rstrip("/") == base_url.rstrip("/"):
             changed = False
+            if api_key and entry.get("api_key") != api_key:
+                entry["api_key"] = api_key
+                changed = True
             if model and entry.get("model") != model:
                 entry["model"] = model
                 changed = True

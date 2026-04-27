@@ -1266,12 +1266,7 @@ def provider_model_ids(provider: Optional[str], *, force_refresh: bool = False) 
     if normalized == "custom":
         base_url = _get_custom_base_url()
         if base_url:
-            # Try common API key env vars for custom endpoints
-            api_key = (
-                os.getenv("CUSTOM_API_KEY", "")
-                or os.getenv("OPENAI_API_KEY", "")
-                or os.getenv("OPENROUTER_API_KEY", "")
-            )
+            api_key = os.getenv("CUSTOM_API_KEY", "")
             live = fetch_api_models(api_key, base_url)
             if live:
                 return live
