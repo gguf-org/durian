@@ -1027,7 +1027,7 @@ def _prune_orphaned_branches(repo_root: str) -> None:
 _ACCENT_ANSI_DEFAULT = "\033[1;38;2;255;215;0m"  # True-color #FFD700 bold — fallback
 _BOLD = "\033[1m"
 _RST = "\033[0m"
-_STREAM_PAD = "    "  # 4-space indent for streamed response text (matches Panel padding)
+_RESPONSE_PREFIX = "✷ "
 
 
 def _hex_to_ansi(hex_color: str, *, bold: bool = False) -> str:
@@ -1108,6 +1108,24 @@ def _cprint(text: str):
     prompt_toolkit parse the escapes and render real colors.
     """
     _pt_print(_PT_ANSI(text))
+
+
+def _response_text_ansi(fallback_hex: str = "#FFF8DC") -> str:
+    """Return ANSI color for assistant response text."""
+    try:
+        from durian_cli.skin_engine import get_active_skin
+        return _hex_to_ansi(get_active_skin().get_color("banner_text", fallback_hex))
+    except Exception:
+        return _hex_to_ansi(fallback_hex)
+
+
+def _print_plain_response(text: str, prefix: str = _RESPONSE_PREFIX) -> None:
+    """Print an assistant response as simple prefixed lines."""
+    text_ansi = _response_text_ansi()
+    lines = (text or "").splitlines() or [""]
+    for idx, line in enumerate(lines):
+        line_prefix = prefix if idx == 0 else " " * len(prefix)
+        _cprint(f"{_ACCENT}{line_prefix}{_RST}{text_ansi}{line}{_RST}")
 
 
 # ---------------------------------------------------------------------------
@@ -2585,33 +2603,15 @@ class DurianCLI:
         # Close the live reasoning box before opening the response box
         self._close_reasoning_box()
 
-        # Open the response box header on the very first visible text
+        # Initialize simple response output on the very first visible text.
         if not self._stream_box_opened:
             # Strip leading whitespace/newlines before first visible content
             text = text.lstrip("\n")
             if not text:
                 return
             self._stream_box_opened = True
-            try:
-                from durian_cli.skin_engine import get_active_skin
-                _skin = get_active_skin()
-                label = _skin.get_branding("response_label", "𖦹 Durian")
-                _text_hex = _skin.get_color("banner_text", "#FFF8DC")
-            except Exception:
-                label = "✷ Durian"
-                _text_hex = "#FFF8DC"
-            # Build a true-color ANSI escape for the response text color
-            # so streamed content matches the Rich Panel appearance.
-            try:
-                _r = int(_text_hex[1:3], 16)
-                _g = int(_text_hex[3:5], 16)
-                _b = int(_text_hex[5:7], 16)
-                self._stream_text_ansi = f"\033[38;2;{_r};{_g};{_b}m"
-            except (ValueError, IndexError):
-                self._stream_text_ansi = ""
-            w = shutil.get_terminal_size().columns
-            fill = w - 2 - len(label)
-            _cprint(f"\n{_ACCENT}╭─{label}{'─' * max(fill - 1, 0)}╮{_RST}")
+            self._stream_text_ansi = _response_text_ansi()
+            self._stream_line_prefix = _RESPONSE_PREFIX
 
         self._stream_buf += text
 
@@ -2619,7 +2619,9 @@ class DurianCLI:
         _tc = getattr(self, "_stream_text_ansi", "")
         while "\n" in self._stream_buf:
             line, self._stream_buf = self._stream_buf.split("\n", 1)
-            _cprint(f"{_STREAM_PAD}{_tc}{line}{_RST}" if _tc else f"{_STREAM_PAD}{line}")
+            prefix = getattr(self, "_stream_line_prefix", _RESPONSE_PREFIX)
+            _cprint(f"{_ACCENT}{prefix}{_RST}{_tc}{line}{_RST}" if _tc else f"{prefix}{line}")
+            self._stream_line_prefix = " " * len(_RESPONSE_PREFIX)
 
     def _flush_stream(self) -> None:
         """Emit any remaining partial line from the stream buffer and close the box."""
@@ -2636,13 +2638,10 @@ class DurianCLI:
 
         if self._stream_buf:
             _tc = getattr(self, "_stream_text_ansi", "")
-            _cprint(f"{_STREAM_PAD}{_tc}{self._stream_buf}{_RST}" if _tc else f"{_STREAM_PAD}{self._stream_buf}")
+            prefix = getattr(self, "_stream_line_prefix", _RESPONSE_PREFIX)
+            _cprint(f"{_ACCENT}{prefix}{_RST}{_tc}{self._stream_buf}{_RST}" if _tc else f"{prefix}{self._stream_buf}")
+            self._stream_line_prefix = " " * len(_RESPONSE_PREFIX)
             self._stream_buf = ""
-
-        # Close the response box
-        if self._stream_box_opened:
-            w = shutil.get_terminal_size().columns
-            _cprint(f"{_ACCENT}╰{'─' * (w - 2)}╯{_RST}")
 
     def _reset_stream_state(self) -> None:
         """Reset streaming state before each agent invocation."""
@@ -2650,6 +2649,7 @@ class DurianCLI:
         self._stream_started = False
         self._stream_box_opened = False
         self._stream_text_ansi = ""
+        self._stream_line_prefix = _RESPONSE_PREFIX
         self._stream_prefilt = ""
         self._in_reasoning_block = False
         self._stream_last_was_newline = True
@@ -5791,27 +5791,7 @@ class DurianCLI:
                 _cprint(f"  Prompt: \"{prompt[:60]}{'...' if len(prompt) > 60 else ''}\"")
                 ChatConsole().print(f"[{_accent_hex()}]{'─' * 40}[/]")
                 if response:
-                    try:
-                        from durian_cli.skin_engine import get_active_skin
-                        _skin = get_active_skin()
-                        label = _skin.get_branding("response_label", "𖦹 Durian")
-                        _resp_color = _skin.get_color("response_border", "#CD7F32")
-                        _resp_text = _skin.get_color("banner_text", "#FFF8DC")
-                    except Exception:
-                        label = "✷ Durian"
-                        _resp_color = "#CD7F32"
-                        _resp_text = "#FFF8DC"
-
-                    _chat_console = ChatConsole()
-                    _chat_console.print(Panel(
-                        _rich_text_from_ansi(response),
-                        title=f"[{_resp_color} bold]{label} (background #{task_num})[/]",
-                        title_align="left",
-                        border_style=_resp_color,
-                        style=_resp_text,
-                        box=rich_box.HORIZONTALS,
-                        padding=(1, 4),
-                    ))
+                    _print_plain_response(response, prefix=f"✷ background #{task_num}: ")
                 else:
                     _cprint("  (No response generated)")
 
@@ -5921,21 +5901,7 @@ class DurianCLI:
                 print()
 
                 if response:
-                    try:
-                        from durian_cli.skin_engine import get_active_skin
-                        _skin = get_active_skin()
-                        _resp_color = _skin.get_color("response_border", "#4F6D4A")
-                    except Exception:
-                        _resp_color = "#4F6D4A"
-
-                    ChatConsole().print(Panel(
-                        _rich_text_from_ansi(response),
-                        title=f"[{_resp_color} bold]✷ /btw[/]",
-                        title_align="left",
-                        border_style=_resp_color,
-                        box=rich_box.HORIZONTALS,
-                        padding=(1, 4),
-                    ))
+                    _print_plain_response(response, prefix="✷ /btw: ")
                 else:
                     _cprint("  💬 /btw: (no response)")
 
@@ -7691,13 +7657,10 @@ class DurianCLI:
                 def display_callback(sentence: str):
                     """Called by TTS consumer when a sentence is ready to display + speak."""
                     nonlocal _streaming_box_opened
+                    prefix = _RESPONSE_PREFIX if not _streaming_box_opened else " " * len(_RESPONSE_PREFIX)
                     if not _streaming_box_opened:
                         _streaming_box_opened = True
-                        w = self.console.width
-                        label = " ✷ Durian "
-                        fill = w - 2 - len(label)
-                        _cprint(f"\n{_ACCENT}╭─{label}{'─' * max(fill - 1, 0)}╮{_RST}")
-                    _cprint(f"{_STREAM_PAD}{sentence.rstrip()}")
+                    _cprint(f"{_ACCENT}{prefix}{_RST}{_response_text_ansi()}{sentence.rstrip()}{_RST}")
 
                 tts_thread = threading.Thread(
                     target=stream_tts_to_speaker,
@@ -7913,39 +7876,16 @@ class DurianCLI:
                     _cprint(f"\n{r_top}\n{_DIM}{display_reasoning}{_RST}\n{r_bot}")
 
             if response and not response_previewed:
-                # Use skin engine for label/color with fallback
-                try:
-                    from durian_cli.skin_engine import get_active_skin
-                    _skin = get_active_skin()
-                    label = _skin.get_branding("response_label", "✷ Durian")
-                    _resp_color = _skin.get_color("response_border", "#CD7F32")
-                    _resp_text = _skin.get_color("banner_text", "#FFF8DC")
-                except Exception:
-                    label = "✷ Durian"
-                    _resp_color = "#CD7F32"
-                    _resp_text = "#FFF8DC"
-
                 is_error_response = result and (result.get("failed") or result.get("partial"))
                 already_streamed = self._stream_started and self._stream_box_opened and not is_error_response
                 if use_streaming_tts and _streaming_box_opened and not is_error_response:
-                    # Text was already printed sentence-by-sentence; just close the box
-                    w = shutil.get_terminal_size().columns
-                    _cprint(f"\n{_ACCENT}╰{'─' * (w - 2)}╯{_RST}")
+                    # Text was already printed sentence-by-sentence.
+                    pass
                 elif already_streamed:
-                    # Response was already streamed token-by-token with box framing;
-                    # _flush_stream() already closed the box. Skip Rich Panel.
+                    # Response was already streamed token-by-token.
                     pass
                 else:
-                    _chat_console = ChatConsole()
-                    _chat_console.print(Panel(
-                        _rich_text_from_ansi(response),
-                        title=f"[{_resp_color} bold]{label}[/]",
-                        title_align="left",
-                        border_style=_resp_color,
-                        style=_resp_text,
-                        box=rich_box.HORIZONTALS,
-                        padding=(1, 4),
-                    ))
+                    _print_plain_response(response)
 
 
             # Play terminal bell when agent finishes (if enabled).
