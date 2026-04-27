@@ -400,7 +400,8 @@ def _resolve_named_custom_runtime(
         (explicit_api_key or "").strip(),
         str(custom_provider.get("api_key", "") or "").strip(),
         os.getenv(str(custom_provider.get("key_env", "") or "").strip(), "").strip(),
-        os.getenv("CUSTOM_API_KEY", "").strip(),
+        os.getenv("OPENAI_API_KEY", "").strip(),
+        os.getenv("OPENROUTER_API_KEY", "").strip(),
     ]
     api_key = next((candidate for candidate in api_key_candidates if has_usable_secret(candidate)), "")
 
@@ -460,9 +461,9 @@ def _resolve_openrouter_runtime(
 
     # Choose API key based on whether the resolved base_url targets OpenRouter.
     # When hitting OpenRouter, prefer OPENROUTER_API_KEY (issue #289).
-    # When hitting a custom endpoint (e.g. Z.ai, local LLM), only use custom
-    # endpoint credentials so OpenAI/OpenRouter keys do not leak to unrelated
-    # providers.
+    # When hitting a custom endpoint (e.g. Z.ai, local LLM), prefer
+    # OPENAI_API_KEY so the OpenRouter key doesn't leak to an unrelated
+    # provider (issues #420, #560).
     _is_openrouter_url = "openrouter.ai" in base_url
     if _is_openrouter_url:
         api_key_candidates = [
@@ -479,7 +480,8 @@ def _resolve_openrouter_runtime(
             explicit_api_key,
             (cfg_api_key if use_config_base_url else ""),
             (os.getenv("OLLAMA_API_KEY") if _is_ollama_url else ""),
-            os.getenv("CUSTOM_API_KEY"),
+            os.getenv("OPENAI_API_KEY"),
+            os.getenv("OPENROUTER_API_KEY"),
         ]
     api_key = next(
         (str(candidate or "").strip() for candidate in api_key_candidates if has_usable_secret(candidate)),

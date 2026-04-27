@@ -7,7 +7,7 @@ the best available backend without duplicating fallback logic.
 Resolution order for text tasks (auto mode):
   1. OpenRouter  (OPENROUTER_API_KEY)
   2. Nous Portal (~/.durian/auth.json active provider)
-  3. Custom endpoint (config.yaml model.base_url + CUSTOM_API_KEY/model.api_key)
+  3. Custom endpoint (config.yaml model.base_url + OPENAI_API_KEY)
   4. Codex OAuth (Responses API via chatgpt.com with gpt-5.3-codex,
      wrapped to look like a chat.completions client)
   5. Native Anthropic
@@ -861,7 +861,7 @@ def _resolve_custom_runtime() -> Tuple[Optional[str], Optional[str], Optional[st
 
     if not isinstance(runtime, dict):
         openai_base = os.getenv("OPENAI_BASE_URL", "").strip().rstrip("/")
-        openai_key = os.getenv("CUSTOM_API_KEY", "").strip()
+        openai_key = os.getenv("OPENAI_API_KEY", "").strip()
         if not openai_base:
             return None, None, None
         runtime = {
@@ -1280,7 +1280,7 @@ def resolve_provider_client(
         provider: Provider identifier.  One of:
             "openrouter", "nous", "openai-codex" (or "codex"),
             "zai", "kimi-coding", "minimax", "minimax-cn",
-            "custom" (OPENAI_BASE_URL + CUSTOM_API_KEY/model.api_key),
+            "custom" (OPENAI_BASE_URL + OPENAI_API_KEY),
             "auto" (full auto-detection chain).
         model: Model slug override.  If None, uses the provider's default
                auxiliary model.
@@ -1399,13 +1399,13 @@ def resolve_provider_client(
         return (_to_async_client(client, final_model) if async_mode
                 else (client, final_model))
 
-    # ── Custom endpoint (OPENAI_BASE_URL + CUSTOM_API_KEY/model.api_key) ───
+    # ── Custom endpoint (OPENAI_BASE_URL + OPENAI_API_KEY) ───────────
     if provider == "custom":
         if explicit_base_url:
             custom_base = explicit_base_url.strip()
             custom_key = (
                 (explicit_api_key or "").strip()
-                or os.getenv("CUSTOM_API_KEY", "").strip()
+                or os.getenv("OPENAI_API_KEY", "").strip()
                 or "no-key-required"  # local servers don't need auth
             )
             if not custom_base:
