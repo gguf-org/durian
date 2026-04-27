@@ -1027,7 +1027,8 @@ def _prune_orphaned_branches(repo_root: str) -> None:
 _ACCENT_ANSI_DEFAULT = "\033[1;38;2;255;215;0m"  # True-color #FFD700 bold — fallback
 _BOLD = "\033[1m"
 _RST = "\033[0m"
-_RESPONSE_PREFIX = "✷ "
+_RESPONSE_PREFIX = "✷ Durian: "
+_RESPONSE_SUFFIX = " ✷"
 
 
 def _hex_to_ansi(hex_color: str, *, bold: bool = False) -> str:
@@ -1123,9 +1124,12 @@ def _print_plain_response(text: str, prefix: str = _RESPONSE_PREFIX) -> None:
     """Print an assistant response as simple prefixed lines."""
     text_ansi = _response_text_ansi()
     lines = (text or "").splitlines() or [""]
+    _cprint("")
     for idx, line in enumerate(lines):
         line_prefix = prefix if idx == 0 else " " * len(prefix)
-        _cprint(f"{_ACCENT}{line_prefix}{_RST}{text_ansi}{line}{_RST}")
+        line_suffix = _RESPONSE_SUFFIX if idx == len(lines) - 1 else ""
+        _cprint(f"{_ACCENT}{line_prefix}{_RST}{text_ansi}{line}{_RST}{_ACCENT}{line_suffix}{_RST}")
+    _cprint("")
 
 
 # ---------------------------------------------------------------------------
@@ -2612,6 +2616,7 @@ class DurianCLI:
             self._stream_box_opened = True
             self._stream_text_ansi = _response_text_ansi()
             self._stream_line_prefix = _RESPONSE_PREFIX
+            _cprint("")
 
         self._stream_buf += text
 
@@ -2639,9 +2644,14 @@ class DurianCLI:
         if self._stream_buf:
             _tc = getattr(self, "_stream_text_ansi", "")
             prefix = getattr(self, "_stream_line_prefix", _RESPONSE_PREFIX)
-            _cprint(f"{_ACCENT}{prefix}{_RST}{_tc}{self._stream_buf}{_RST}" if _tc else f"{prefix}{self._stream_buf}")
+            _cprint(
+                f"{_ACCENT}{prefix}{_RST}{_tc}{self._stream_buf}{_RST}{_ACCENT}{_RESPONSE_SUFFIX}{_RST}"
+                if _tc else f"{prefix}{self._stream_buf}{_RESPONSE_SUFFIX}"
+            )
             self._stream_line_prefix = " " * len(_RESPONSE_PREFIX)
             self._stream_buf = ""
+        if self._stream_box_opened:
+            _cprint("")
 
     def _reset_stream_state(self) -> None:
         """Reset streaming state before each agent invocation."""
@@ -7660,6 +7670,7 @@ class DurianCLI:
                     prefix = _RESPONSE_PREFIX if not _streaming_box_opened else " " * len(_RESPONSE_PREFIX)
                     if not _streaming_box_opened:
                         _streaming_box_opened = True
+                        _cprint("")
                     _cprint(f"{_ACCENT}{prefix}{_RST}{_response_text_ansi()}{sentence.rstrip()}{_RST}")
 
                 tts_thread = threading.Thread(
@@ -7880,7 +7891,8 @@ class DurianCLI:
                 already_streamed = self._stream_started and self._stream_box_opened and not is_error_response
                 if use_streaming_tts and _streaming_box_opened and not is_error_response:
                     # Text was already printed sentence-by-sentence.
-                    pass
+                    _cprint(f"{_ACCENT}{' ' * len(_RESPONSE_PREFIX)}{_RESPONSE_SUFFIX.strip()}{_RST}")
+                    _cprint("")
                 elif already_streamed:
                     # Response was already streamed token-by-token.
                     pass
