@@ -21,7 +21,7 @@ durian
 
 ## Acknowledgments
 
-Thanks all contributors in the Community, especially Nous Research (MIT License) to make the based code open sourced! Really appreciate!♥️
+Thanks all contributors in the Community🤖, especially Peter from OpenClaw🦞 (MIT License) and Nous Research ☤ (MIT License) to make the based code open sourced! Really appreciate!♥️
 
 ## License
 

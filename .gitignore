@@ -50,6 +50,8 @@ skills/.hub/
 ignored/
 .worktrees/
 environments/benchmarks/evals/
+.claude
+.codex
 
 # Web UI build output
 durian_cli/web_dist/
