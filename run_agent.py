@@ -1401,7 +1401,7 @@ class AIAgent:
         self.compression_enabled = compression_enabled
 
         # Reject models whose context window is below the minimum required
-        # for reliable tool-calling workflows (64K tokens).
+        # for reliable tool-calling workflows.
         from agent.model_metadata import MINIMUM_CONTEXT_LENGTH
         _ctx = getattr(self.context_compressor, "context_length", 0)
         if _ctx and _ctx < MINIMUM_CONTEXT_LENGTH:

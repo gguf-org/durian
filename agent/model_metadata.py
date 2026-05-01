@@ -79,7 +79,7 @@ _ENDPOINT_MODEL_CACHE_TTL = 300
 CONTEXT_PROBE_TIERS = [
     128_000,
     64_000,
-    32_000,
+    32_768,
     16_000,
     8_000,
 ]
@@ -90,7 +90,7 @@ DEFAULT_FALLBACK_CONTEXT = CONTEXT_PROBE_TIERS[0]
 # Minimum context length required to run Durian Agent.  Models with fewer
 # tokens cannot maintain enough working memory for tool-calling workflows.
 # Sessions, model switches, and cron jobs should reject models below this.
-MINIMUM_CONTEXT_LENGTH = 64_000
+MINIMUM_CONTEXT_LENGTH = 32_768
 
 # Thin fallback defaults — only broad model family patterns.
 # These fire only when provider is unknown AND models.dev/OpenRouter/Anthropic
